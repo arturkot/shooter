@@ -1,0 +1,9 @@
+{
+  "name": "Shooter",
+  "dependencies": {
+    "lodash": "registry:npm/lodash#4.0.0+20161015015725"
+  },
+  "globalDependencies": {
+    "three": "registry:dt/three#0.0.0+20161004170959"
+  }
+}
