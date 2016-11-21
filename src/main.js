@@ -8,7 +8,8 @@ import {
 import {
   generateEnemies, getFreeEnemyId, rebornEnemies,
   updateEnemy, rebuildEnemy, updateEnemyInScene,
-  handleEnemyCollision, updateEnemiesAppearanceInScene
+  handleEnemyCollision, updateEnemiesAppearanceInScene,
+  resetEnemiesAppearanceInScene
 } from "./enemies";
 import { leftBoundry, rightBoundry, addBoundries } from "./boundries";
 
@@ -41,7 +42,7 @@ function render(scene, camera, { enemies, ammo, xShip } = {}) {
       isStarted = true;
     }
 
-    updateEnemiesAppearanceInScene(defaultEnemies, defaultEnemies, scene);
+    resetEnemiesAppearanceInScene(defaultEnemies, scene);
 
     return requestAnimationFrame( () => {
       render(scene, camera, {

@@ -158,6 +158,13 @@ export function updateEnemiesAppearanceInScene (enemies, newEnemies, scene) {
   }
 }
 
+export function resetEnemiesAppearanceInScene (enemies, scene) {
+  enemies.forEach( enemy => {
+    const element = scene.getObjectById(enemy.id);
+    element.material.color.setHex(0x2C88D8);
+  });
+}
+
 function _getVelocity (energy, maxVelocity) {
   switch (energy) {
     case 1:
