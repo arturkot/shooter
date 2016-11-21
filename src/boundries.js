@@ -4,7 +4,7 @@ export const gameWidth = GAME_HEIGHT * RATIO;
 export const leftBoundry = (gameWidth / -2);
 export const rightBoundry = (gameWidth / 2);
 
-export default function (scene) {
+export function addBoundries (scene) {
   const boundriesGeo = new THREE.BoxGeometry(
     gameWidth,
     GAME_HEIGHT,

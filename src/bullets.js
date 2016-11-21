@@ -1,7 +1,8 @@
-import { last, range } from "lodash";
+import { range } from "lodash";
+import { rangeIntersects, rectIntersect } from "./collisionDetection";
 
 export function generateBullets (maxNr, scene) {
-  const OFFSCREEN_Y = 9999;
+  const OFFSCREEN = 9999;
   const bullets = range(maxNr);
 
   return bullets.map( () => {
@@ -9,19 +10,21 @@ export function generateBullets (maxNr, scene) {
     const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     const element = new THREE.Mesh(geometry, material);
 
-    element.position.y = OFFSCREEN_Y;
+    element.position.y = OFFSCREEN;
     scene.add(element);
 
     return {
-      element,
-      box3: new THREE.Box3().setFromObject(element),
+      id: element.id,
+      x: OFFSCREEN,
+      y: OFFSCREEN,
+      height: new THREE.Box3().setFromObject(element).getSize().y,
       isActive: false,
       emittedAt: undefined
     };
   });
 }
 
-export function emitBullet (ammo, xShip, isShoot) {
+export function getFreeBulletId (ammo, isShoot) {
   if (!isShoot) { return; }
 
   const MIN_DELAY = 400;
@@ -34,52 +37,68 @@ export function emitBullet (ammo, xShip, isShoot) {
     !lastBullet ||
     Date.now() - lastBullet.emittedAt > MIN_DELAY
   ) {
-    const freeBullet = ammo.find( bullet => !bullet.isActive);
-
-    if (!freeBullet) { return; }
-
-    const { element } = freeBullet;
-
-    element.position.x = xShip.position.x;
-    element.position.y = xShip.position.y;
-    freeBullet.isActive = true;
-    freeBullet.emittedAt = Date.now();
+    const freeBullet = ammo.find( bullet => !bullet.isActive ) || {};
+    return freeBullet.id;
   }
 }
 
-export function updateBullets (ammo, enemies, collisionCallback) {
-  ammo
-    .filter(bullet => bullet.isActive)
-    .forEach( updateBullet.bind(null, collisionCallback, enemies) );
+export function updateBullet ({
+  bullet, index, enemies, bulletSpeed,
+  x, defaultY, maxBulletsOnScreen, freeBulletId
+}) {
+  const thisBullet = Object.assign({}, bullet)
+
+  if (
+    thisBullet.isActive &&
+    thisBullet.y > thisBullet.height * maxBulletsOnScreen) {
+    thisBullet.isActive = false;
+  }
+
+  if (thisBullet.isActive) {
+    thisBullet.y += bulletSpeed;
+  }
+
+  if (thisBullet.id === freeBulletId) {
+    thisBullet.isActive = true;
+    thisBullet.x = x;
+    thisBullet.y = defaultY;
+    thisBullet.emittedAt = Date.now();
+  }
+
+  return thisBullet;
 }
 
-function updateBullet (collisionCallback, enemies, bullet) {
-  const MAX_BULLETS_ON_SCREEN = 10;
-
-  if (bullet.element.position.y > bullet.box3.getSize().y * MAX_BULLETS_ON_SCREEN) {
-    bullet.isActive = false;
-  } else {
-    bullet.element.position.y += 0.3;
-  }
+export function detectBulletCollisionAgainstEnemies ({
+  bullet, enemies, scene, collisionCallback
+} = {}) {
+  const thisBullet = Object.assign({}, bullet);
 
   enemies.filter(enemy => enemy.isActive).forEach(enemy => {
-    const enemyBox = new THREE.Box3().setFromObject(enemy.element);
-    const bulletBox = new THREE.Box3().setFromObject(bullet.element);
+    const enemyElement = scene.getObjectById(enemy.id);
+    const bulletElement = scene.getObjectById(thisBullet.id);
+    const enemyBox = new THREE.Box3().setFromObject(enemyElement);
+    const bulletBox = new THREE.Box3().setFromObject(bulletElement);
 
     if ( rectIntersect(enemyBox, bulletBox) ) {
-      bullet.isActive = false;
-      bullet.element.position.y = 9999;
-      collisionCallback(enemy);
+      thisBullet.isActive = false;
+
+      if (collisionCallback) {
+        collisionCallback(enemy.id);
+      }
     }
   });
+
+  return thisBullet;
 }
 
-function rangeIntersects (min0, max0, min1, max1) {
-  return  Math.max(min0, max0) >= Math.min(min1, max1) &&
-          Math.min(min0, max0) <= Math.max(min1, max1);
-}
+export function updateBulletInScene (bullet, scene) {
+  const OFFSCREEN = 9999;
+  const element = scene.getObjectById(bullet.id);
 
-function rectIntersect (box3A, box3B) {
-  return  rangeIntersects(box3A.min.x, box3A.max.x, box3B.min.x, box3B.max.x) &&
-          rangeIntersects(box3A.min.y, box3A.max.y, box3B.min.y, box3B.max.y);
+  if (bullet.isActive) {
+    element.position.x = bullet.x;
+    element.position.y = bullet.y;
+  } else {
+    element.position.y = OFFSCREEN;
+  }
 }
