@@ -1,8 +1,12 @@
+export const GAME_HEIGHT = 15;
+export const RATIO = 0.5625;
+export const gameWidth = GAME_HEIGHT * RATIO;
+export const leftBoundry = (gameWidth / -2);
+export const rightBoundry = (gameWidth / 2);
+
 export default function (scene) {
-  const GAME_HEIGHT = 15;
-  const RATIO_1080p = 0.5625;
   const boundriesGeo = new THREE.BoxGeometry(
-    GAME_HEIGHT * RATIO_1080p,
+    gameWidth,
     GAME_HEIGHT,
     1
   );
