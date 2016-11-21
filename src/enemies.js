@@ -61,7 +61,8 @@ export function rebornEnemies (enemies) {
 }
 
 export function updateEnemy ({
-  enemy, freeEnemyId, top, bottom, leftBoundry, rightBoundry
+  enemy, freeEnemyId, top, bottom, leftBoundry, rightBoundry,
+  gotPastScreenCallback
 } = {}) {
   const thisEnemy = Object.assign({}, enemy);
 
@@ -72,7 +73,12 @@ export function updateEnemy ({
     thisEnemy.emittedAt = Date.now();
   }
 
-  if (thisEnemy.y < bottom || thisEnemy.energy <= 0) {
+  if (thisEnemy.y < bottom) {
+    if (gotPastScreenCallback) { gotPastScreenCallback(); }
+    return rebuildEnemy(thisEnemy);
+  }
+
+  if (thisEnemy.energy <= 0) {
     return rebuildEnemy(thisEnemy);
   }
 
@@ -145,6 +151,8 @@ export function updateEnemiesAppearanceInScene (enemies, newEnemies, scene) {
         element.material.color.setHex(0xC922B0);
       } else if (newEnemy.velocity > 0.08) {
         element.material.color.setHex(0xED0D33);
+      } else {
+        element.material.color.setHex(0x2C88D8);
       }
     });
   }
@@ -155,7 +163,7 @@ function _getVelocity (energy, maxVelocity) {
     case 1:
       return random(MIN_VELOCITY, maxVelocity, true);
     case 2:
-      return random(MIN_VELOCITY, MIN_VELOCITY + 0.15, true);
+      return random(MIN_VELOCITY, MIN_VELOCITY + 0.01, true);
     case 3:
       return MIN_VELOCITY;
   }

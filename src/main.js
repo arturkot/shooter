@@ -20,16 +20,38 @@ const TOP = 8;
 const BOTTOM = -8;
 const MAX_BULLETS_ON_SCREEN = 10;
 
-const enemies = generateEnemies(ENEMIES_WAVE, scene);
-const ammo = generateBullets(MAX_BULLETS, scene);
+let isStarted = false;
+
 const xShip = addXShip(scene, XSHIP_Y);
+const defaultAmmo = generateBullets(MAX_BULLETS, scene);
+const defaultEnemies = generateEnemies(ENEMIES_WAVE, scene);
 
 addBoundries(scene);
 render(scene, camera, {
-  enemies, ammo, xShip
+  xShip,
+  ammo: defaultAmmo,
+  enemies: defaultEnemies
 });
 
 function render(scene, camera, { enemies, ammo, xShip } = {}) {
+  renderer.render(scene, camera);
+
+  if (!isStarted) {
+    if (isShoot) {
+      isStarted = true;
+    }
+
+    updateEnemiesAppearanceInScene(defaultEnemies, defaultEnemies, scene);
+
+    return requestAnimationFrame( () => {
+      render(scene, camera, {
+        xShip,
+        ammo: defaultAmmo,
+        enemies: defaultEnemies
+      });
+    });
+  }
+
   let enemiesHit = [];
   const freeBulletId = getFreeBulletId(ammo, isShoot);
   const freeEnemyId = getFreeEnemyId(enemies);
@@ -52,7 +74,8 @@ function render(scene, camera, { enemies, ammo, xShip } = {}) {
     .map( enemy => updateEnemy({
       enemy, freeEnemyId, leftBoundry, rightBoundry,
       top: TOP,
-      bottom: BOTTOM
+      bottom: BOTTOM,
+      gotPastScreenCallback: () => isStarted = false
     }) );
 
   updateEnemiesAppearanceInScene(enemies, newEnemies, scene);
@@ -60,7 +83,6 @@ function render(scene, camera, { enemies, ammo, xShip } = {}) {
   newEnemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
   moveXShip(xShip, isMoveLeft, isMoveRight);
 
-  renderer.render(scene, camera);
 	requestAnimationFrame(
     render.bind(null, scene, camera, {
       xShip,
