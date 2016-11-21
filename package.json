@@ -15,6 +15,6 @@
     "webpack-dev-server": "^1.16.2"
   },
   "scripts": {
-    "start": "webpack-dev-server --progress --colors"
+    "start": "webpack-dev-server --progress --colors --host 0.0.0.0"
   }
 }
