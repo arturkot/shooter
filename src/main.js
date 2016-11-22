@@ -41,7 +41,6 @@ parsedResults.then(assets => {
   const defaultEnemies = generateEnemies(ENEMIES_WAVE, xTriangle, scene);
   const sphereBg = addSphereBg(sphereBgGeo, scene);
 
-  addBoundries(scene);
   render(scene, camera, {
     xShip, sphereBg, defaultAmmo,
     defaultEnemies,
