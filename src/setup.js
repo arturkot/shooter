@@ -9,11 +9,14 @@ const camera = new THREE.OrthographicCamera(
   1000
 );
 const renderer = new THREE.WebGLRenderer();
+const light = new THREE.PointLight(0xffffff, 1.3, 100);
 
 renderer.setSize( window.innerWidth, window.innerHeight );
 document.body.appendChild( renderer.domElement );
 window.addEventListener('resize', updateSize);
 updateSize();
+light.position.set(0, 0, 5);
+scene.add(light);
 
 function updateSize () {
   renderer.setSize(window.innerWidth, window.innerHeight);
