@@ -14,9 +14,31 @@
     canvas {
       display: block;
     }
+
+    .left-wing,
+    .right-wing {
+      position: absolute;
+      top: 0;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      background-size: cover;
+      width: calc(50% - ( 100vh * (9 / 16) ) / 2);
+    }
+
+    .left-wing {
+      left: 0;
+      background-image: linear-gradient(to right, black, transparent);
+    }
+
+    .right-wing {
+      right: 0;
+      background-image: linear-gradient(to left, black, transparent);
+    }
   </style>
 </head>
 <body>
+  <div class="left-wing"></div>
+  <div class="right-wing"></div>
   <script src="node_modules/three/build/three.min.js"></script>
   <script src="dist/main.js"></script>
 </body>
