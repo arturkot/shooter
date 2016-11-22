@@ -12,7 +12,7 @@ import {
   resetEnemiesAppearanceInScene
 } from "./enemies";
 import { addSphereBg, animateSphereBg } from "./sphereBg";
-import { leftBoundry, rightBoundry, addBoundries } from "./boundries";
+import { leftBoundry, rightBoundry, addboundaries } from "./boundaries";
 import { parsedResults } from "./getAssets";
 
 const SPHERE_BG_URL = 'meshes/sphere-bg.json';
