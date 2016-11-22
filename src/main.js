@@ -16,7 +16,7 @@ import { leftBoundry, rightBoundry, addBoundries } from "./boundries";
 import { parsedResults } from "./getAssets";
 
 const SPHERE_BG_URL = 'meshes/sphere-bg.json';
-const ENEMIES_WAVE = 20;
+const ENEMIES_WAVE = 24;
 const MAX_BULLETS = 11;
 const BULLET_SPEED = 0.3;
 const XSHIP_Y = -6;
@@ -38,7 +38,7 @@ parsedResults.then(assets => {
     y: XSHIP_Y
   });
   const defaultAmmo = generateBullets(MAX_BULLETS, scene);
-  const defaultEnemies = generateEnemies(ENEMIES_WAVE, scene);
+  const defaultEnemies = generateEnemies(ENEMIES_WAVE, xTriangle, scene);
   const sphereBg = addSphereBg(sphereBgGeo, scene);
 
   addBoundries(scene);
