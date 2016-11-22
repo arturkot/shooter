@@ -6,8 +6,8 @@ export function generateBullets (maxNr, scene) {
   const bullets = range(maxNr);
 
   return bullets.map( () => {
-    const geometry = new THREE.BoxGeometry(0.2, 1, 1);
-    const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const geometry = new THREE.ConeGeometry(0.1, 0.6, 8);;
+    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const element = new THREE.Mesh(geometry, material);
 
     element.position.y = OFFSCREEN;
@@ -61,7 +61,7 @@ export function updateBullet ({
   if (thisBullet.id === freeBulletId) {
     thisBullet.isActive = true;
     thisBullet.x = x;
-    thisBullet.y = defaultY;
+    thisBullet.y = defaultY + 0.9;
     thisBullet.emittedAt = Date.now();
   }
 
