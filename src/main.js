@@ -11,8 +11,9 @@ import {
   handleEnemyCollision, updateEnemiesAppearanceInScene,
   resetEnemiesAppearanceInScene
 } from "./enemies";
-import { loadSphereBg, animateSphereBg } from "./sphereBg";
+import { addSphereBg, animateSphereBg } from "./sphereBg";
 import { leftBoundry, rightBoundry, addBoundries } from "./boundries";
+import { parsedResults } from "./getAssets";
 
 const SPHERE_BG_URL = 'meshes/sphere-bg.json';
 const ENEMIES_WAVE = 20;
@@ -25,10 +26,15 @@ const MAX_BULLETS_ON_SCREEN = 10;
 
 let isStarted = false;
 
-loadSphereBg(SPHERE_BG_URL, scene).then(sphereBg => {
-  const xShip = addXShip(scene, XSHIP_Y);
+parsedResults.then(assets => {
+  const {
+    xShipCloud, xShipBody, xShipRear,
+    xTriangle, xChunk, sphereBgGeo
+  } = assets;
+
   const defaultAmmo = generateBullets(MAX_BULLETS, scene);
   const defaultEnemies = generateEnemies(ENEMIES_WAVE, scene);
+  const sphereBg = addSphereBg(sphereBgGeo, scene);
 
   addBoundries(scene);
   render(scene, camera, {
