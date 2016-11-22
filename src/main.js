@@ -32,6 +32,11 @@ parsedResults.then(assets => {
     xTriangle, xChunk, sphereBgGeo
   } = assets;
 
+  const xShip = addXShip({
+    xShipCloud, xShipBody, xShipRear,
+    xTriangle, xChunk, scene,
+    y: XSHIP_Y
+  });
   const defaultAmmo = generateBullets(MAX_BULLETS, scene);
   const defaultEnemies = generateEnemies(ENEMIES_WAVE, scene);
   const sphereBg = addSphereBg(sphereBgGeo, scene);
@@ -97,7 +102,7 @@ function render(scene, camera, {
   updateEnemiesAppearanceInScene(enemies, newEnemies, scene);
   newAmmo.forEach( bullet => updateBulletInScene(bullet, scene) );
   newEnemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
-  moveXShip(xShip, isMoveLeft, isMoveRight);
+  moveXShip({ xShip, isMoveLeft, isMoveRight, leftBoundry, rightBoundry });
   animateSphereBg(sphereBg);
 
 	requestAnimationFrame(
