@@ -11,8 +11,10 @@ import {
   handleEnemyCollision, updateEnemiesAppearanceInScene,
   resetEnemiesAppearanceInScene
 } from "./enemies";
+import { loadSphereBg, animateSphereBg } from "./sphereBg";
 import { leftBoundry, rightBoundry, addBoundries } from "./boundries";
 
+const SPHERE_BG_URL = 'meshes/sphere-bg.json';
 const ENEMIES_WAVE = 20;
 const MAX_BULLETS = 11;
 const BULLET_SPEED = 0.3;
@@ -23,18 +25,24 @@ const MAX_BULLETS_ON_SCREEN = 10;
 
 let isStarted = false;
 
-const xShip = addXShip(scene, XSHIP_Y);
-const defaultAmmo = generateBullets(MAX_BULLETS, scene);
-const defaultEnemies = generateEnemies(ENEMIES_WAVE, scene);
+loadSphereBg(SPHERE_BG_URL, scene).then(sphereBg => {
+  const xShip = addXShip(scene, XSHIP_Y);
+  const defaultAmmo = generateBullets(MAX_BULLETS, scene);
+  const defaultEnemies = generateEnemies(ENEMIES_WAVE, scene);
 
-addBoundries(scene);
-render(scene, camera, {
-  xShip,
-  ammo: defaultAmmo,
-  enemies: defaultEnemies
+  addBoundries(scene);
+  render(scene, camera, {
+    xShip, sphereBg, defaultAmmo,
+    defaultEnemies,
+    ammo: defaultAmmo,
+    enemies: defaultEnemies
+  });
 });
 
-function render(scene, camera, { enemies, ammo, xShip } = {}) {
+function render(scene, camera, {
+  enemies, sphereBg, ammo, xShip,
+  defaultEnemies, defaultAmmo
+} = {}) {
   renderer.render(scene, camera);
 
   if (!isStarted) {
@@ -46,7 +54,8 @@ function render(scene, camera, { enemies, ammo, xShip } = {}) {
 
     return requestAnimationFrame( () => {
       render(scene, camera, {
-        xShip,
+        xShip, sphereBg, defaultAmmo,
+        defaultEnemies,
         ammo: defaultAmmo,
         enemies: defaultEnemies
       });
@@ -83,10 +92,12 @@ function render(scene, camera, { enemies, ammo, xShip } = {}) {
   newAmmo.forEach( bullet => updateBulletInScene(bullet, scene) );
   newEnemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
   moveXShip(xShip, isMoveLeft, isMoveRight);
+  animateSphereBg(sphereBg);
 
 	requestAnimationFrame(
     render.bind(null, scene, camera, {
-      xShip,
+      xShip, sphereBg, defaultAmmo,
+      defaultEnemies,
       enemies: newEnemies,
       ammo: newAmmo
     })
