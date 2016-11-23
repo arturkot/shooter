@@ -5,10 +5,22 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Shooter</title>
   <style>
+    :root {
+      --bg-dark: rgba(0, 0, 0, 0.3);
+      --game-width: calc(100vh * (9 / 16));
+      --boundary-width: calc(50% - var(--game-width) / 2);
+    }
+
+    * {
+      box-sizing: border-box;
+      user-select: none;
+    }
+
     html, body {
       margin: 0;
       padding: 0;
       background: black;
+      font-family: sans-serif;
     }
 
     canvas {
@@ -20,9 +32,9 @@
       position: absolute;
       top: 0;
       height: 100%;
-      background: rgba(0, 0, 0, 0.3);
+      background: var(--bg-dark);
       background-size: cover;
-      width: calc(50% - ( 100vh * (9 / 16) ) / 2);
+      width: var(--boundary-width);
     }
 
     .left-wing {
@@ -34,9 +46,50 @@
       right: 0;
       background-image: linear-gradient(to left, black, transparent);
     }
+
+    .score {
+      position: absolute;
+      top: 0;
+      left: var(--boundary-width);
+      display: flex;
+      justify-content: space-between;
+      width: var(--game-width);
+      background: var(--bg-dark);
+      color: white;
+      padding: 2vh;
+      font-size: 1.8vh;
+    }
+
+    .score__points {
+      font-size: 2.4vh;
+    }
+
+    .game-over {
+      transition: opacity .2s;
+      position: absolute;
+      top: 0;
+      left: var(--boundary-width);
+      width: var(--game-width);
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.5);
+      color: white;
+      font-size: 5vh;
+      text-align: center;
+      line-height: 100vh;
+      opacity: 0;
+    }
+
+    .game-over.is-show {
+      opacity: 1;
+    }
   </style>
 </head>
 <body>
+  <div class="score">
+    <div>Score: <span class="score__points js-score">0000</span></div>
+    <div>Hi-score: <span class="score__points js-hi-score">0000</span></div>
+  </div>
+  <div class="game-over js-game-over">Game Over</div>
   <div class="left-wing"></div>
   <div class="right-wing"></div>
   <script src="node_modules/three/build/three.min.js"></script>

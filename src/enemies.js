@@ -11,20 +11,27 @@ export function generateEnemies (maxNr, xTriangle, scene) {
   const enemies = range(maxNr);
 
   return enemies.map( (nr) => {
+    const DEFAULT_ENERGY = 1;
+    const DEFAULT_LEVEL = 1;
+    const DEFAULT_SIDE_FORCE = 0;
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshBasicMaterial({
       opacity: 0,
-      transparent: true
+      transparent: true,
+      side: THREE.BackSide
     });
     const xTriangleMaterial = new THREE.MeshPhongMaterial({
       color: 0x78A5EC,
       specular: 0xffffff,
       shading: THREE.FlatShading,
-      side: THREE.BackSide
+      side: THREE.BackSide,
+      opacity: 1,
+      transparent: true
     });
     const triangleA = new THREE.Mesh(xTriangle, xTriangleMaterial);
     const triangleB = new THREE.Mesh(xTriangle, xTriangleMaterial);
     const element = new THREE.Mesh(geometry, material);
+    const velocity = random(MIN_VELOCITY, MAX_VELOCITY, true);
 
     triangleA.position.x = -0.2;
     triangleA.rotation.x = deg(90);
@@ -47,15 +54,24 @@ export function generateEnemies (maxNr, xTriangle, scene) {
       id: element.id,
       x: OFFSCREEN,
       y: OFFSCREEN,
+      opacity: 1,
       rotation: 0,
       isActive: false,
       isUsed: false,
-      energy: 1,
+      isDestroyed: false,
+      energy: DEFAULT_ENERGY,
+      initialEnergy: DEFAULT_ENERGY,
       emittedAt: undefined,
-      level: 1,
-      sideForce: 0,
-      velocity: random(MIN_VELOCITY, MAX_VELOCITY, true),
-      delay: random(MIN_REBORN_TIME, MAX_REBORN_TIME)
+      level: DEFAULT_LEVEL,
+      sideForce: DEFAULT_SIDE_FORCE,
+      velocity,
+      delay: random(MIN_REBORN_TIME, MAX_REBORN_TIME),
+      score: _calculateScore({
+        velocity,
+        initialEnergy: DEFAULT_ENERGY,
+        sideForce: DEFAULT_SIDE_FORCE,
+        level: DEFAULT_LEVEL
+      })
     };
   });
 }
@@ -106,6 +122,14 @@ export function updateEnemy ({
   }
 
   if (thisEnemy.energy <= 0) {
+    thisEnemy.isDestroyed = true;
+  }
+
+  if (thisEnemy.isDestroyed) {
+    thisEnemy.opacity -= 0.1;
+  }
+
+  if (thisEnemy.isDestroyed && thisEnemy.opacity <= 0) {
     return rebuildEnemy(thisEnemy);
   }
 
@@ -140,18 +164,26 @@ export function rebuildEnemy (enemy) {
   const energy = random(1, 100) > 80 ? Math.min(enemy.level + 1, 3) : 1;
   const velocity = _getVelocity(energy, maxVelocity, enemy.level);
   const sideForce = energy > 1 ? 0 : random(-0.1, 0.1, true);
+  const level = enemy.level + 1;
 
   return Object.assign({}, enemy, {
     y: top,
+    opacity: 1,
     rotation: 0,
     isActive: false,
     emittedAt: undefined,
     isUsed: true,
+    isDestroyed: false,
     sideForce,
     velocity,
-    level: enemy.level + 1,
+    level,
     delay: random(minDelay, maxDelay),
-    energy
+    initialEnergy: energy,
+    energy,
+    score: _calculateScore ({
+      velocity, sideForce, level,
+      initialEnergy: energy
+    })
   });
 }
 
@@ -159,10 +191,21 @@ export function updateEnemyInScene (enemy, scene) {
   const OFFSCREEN = 9999;
   const element = scene.getObjectById(enemy.id);
 
+  if (enemy.isDestroyed) {
+    element.scale.x = random(0.9, 2, true);
+    element.scale.y = random(0.9, 2, true);
+  } else {
+    element.scale.x = 1;
+    element.scale.y = 1;
+  }
+
   if (enemy.isActive) {
     element.position.x = enemy.x;
     element.position.y = enemy.y;
     element.rotation.z = enemy.rotation;
+    element.children.forEach( child => {
+      child.material.opacity = enemy.opacity;
+    });
     _updateColor(element, enemy);
   } else {
     element.position.y = OFFSCREEN;
@@ -205,6 +248,10 @@ function _updateColor (element, enemy) {
     element.children.forEach( child => child.material.color.setHex(0x78A5EC) );
   }
 
+  if (enemy.isDestroyed) {
+    element.children.forEach( child => child.material.color.setHex(0xFF0000) );
+  }
+
   switch (energy) {
     case 3:
       element.children.forEach( child => child.material.emissive.setHex(0xB7BBC0) );
@@ -215,4 +262,12 @@ function _updateColor (element, enemy) {
     default:
       element.children.forEach( child => child.material.emissive.setHex(0x000000) );
   }
+}
+
+function _calculateScore ({ velocity, sideForce, level, initialEnergy } = {}) {
+  const velocityScore = velocity || 1;
+  const sideForceScore = sideForce || 1;
+  const score = Math.ceil(level + velocityScore * 10 + sideForceScore * 10 + initialEnergy);
+
+  return score;
 }

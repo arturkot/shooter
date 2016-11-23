@@ -5,6 +5,12 @@ export let isShoot = false;
 window.addEventListener('keydown', handleKeydown, false);
 window.addEventListener('keyup', handleKeyup, false);
 
+export function resetUserEvents () {
+  isMoveLeft = false;
+  isMoveRight = false;
+  isShoot = false;
+}
+
 function handleKeydown (event) {
   const { key } = event;
 

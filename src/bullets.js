@@ -83,7 +83,7 @@ export function detectBulletCollisionAgainstEnemies ({
       thisBullet.isActive = false;
 
       if (collisionCallback) {
-        collisionCallback(enemy.id);
+        collisionCallback(enemy);
       }
     }
   });
