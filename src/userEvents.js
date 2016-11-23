@@ -2,6 +2,10 @@ export let isMoveLeft = false;
 export let isMoveRight = false;
 export let isShoot = false;
 
+const SPACE = 32;
+const ARROW_LEFT = 37;
+const ARROW_RIGHT = 39;
+
 window.addEventListener('keydown', handleKeydown, false);
 window.addEventListener('keyup', handleKeyup, false);
 
@@ -12,31 +16,31 @@ export function resetUserEvents () {
 }
 
 function handleKeydown (event) {
-  const { key } = event;
+  const { keyCode } = event;
 
-  switch (key) {
-    case 'ArrowLeft':
+  switch (keyCode) {
+    case ARROW_LEFT:
       isMoveLeft = true;
       break;
-    case 'ArrowRight':
+    case ARROW_RIGHT:
       isMoveRight = true;
       break;
-    case ' ':
+    case SPACE:
       isShoot = true;
   }
 }
 
 function handleKeyup (event) {
-  const { key } = event;
+  const { keyCode } = event;
 
-  switch (key) {
-    case 'ArrowLeft':
+  switch (keyCode) {
+    case ARROW_LEFT:
       isMoveLeft = false;
       break;
-    case 'ArrowRight':
+    case ARROW_RIGHT:
       isMoveRight = false;
       break;
-    case ' ':
+    case SPACE:
       isShoot = false;
   }
 }
