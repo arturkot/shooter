@@ -212,15 +212,6 @@ export function updateEnemyInScene (enemy, scene) {
   }
 }
 
-export function updateEnemiesAppearanceInScene (enemies, newEnemies, scene) {
-  if ( enemies.every( enemy => enemy.isUsed ) ) {
-    newEnemies.forEach( newEnemy => {
-      const element = scene.getObjectById(newEnemy.id);
-      _updateColor(element, newEnemy);
-    });
-  }
-}
-
 export function resetEnemiesAppearanceInScene (enemies, scene) {
   enemies.forEach( enemy => {
     const element = scene.getObjectById(enemy.id);

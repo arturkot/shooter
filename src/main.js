@@ -11,8 +11,7 @@ import {
 import {
   generateEnemies, getFreeEnemyId, rebornEnemies,
   updateEnemy, rebuildEnemy, updateEnemyInScene,
-  handleEnemyCollision, updateEnemiesAppearanceInScene,
-  resetEnemiesAppearanceInScene
+  handleEnemyCollision, resetEnemiesAppearanceInScene
 } from "./enemies";
 import { addSphereBg, animateSphereBg } from "./sphereBg";
 import { leftBoundry, rightBoundry, addboundaries } from "./boundaries";
@@ -183,7 +182,6 @@ function render(scene, camera, {
         }
       }) );
 
-    updateEnemiesAppearanceInScene(enemies, newEnemies, scene);
     newAmmo.forEach( bullet => updateBulletInScene(bullet, scene) );
     newEnemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
     moveXShip({ xShip, isMoveLeft, isMoveRight, leftBoundry, rightBoundry });
