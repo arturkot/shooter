@@ -52,7 +52,7 @@ parsedResults.then(assets => {
   const defaultEnemies = generateEnemies(ENEMIES_WAVE, xTriangle, scene);
   const sphereBg = addSphereBg(sphereBgGeo, scene);
 
-  updateHiScore({ hiScoreEl });
+  updateHiScore({ hiScoreEl, DEFAULT_SCORE });
 
   render(scene, camera, {
     xShip, sphereBg, defaultAmmo,

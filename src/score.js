@@ -6,9 +6,9 @@ export function updateScore (scoreEl, score) {
 
 export function updateHiScore ({ hiScoreEl, score }) {
   const HI_SCORE_KEY = 'hi-score';
-  const hiScore = localStorage.getItem(HI_SCORE_KEY) || '0';
+  const hiScore = parseInt( localStorage.getItem(HI_SCORE_KEY), 10) || 0;
 
-  if (score && parseInt(localStorage.getItem(HI_SCORE_KEY), 10) < score) {
+  if (score !== undefined && hiScore < score) {
     localStorage.setItem(HI_SCORE_KEY, score);
   }
 
