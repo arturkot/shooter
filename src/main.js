@@ -48,10 +48,6 @@ parsedResults.then(assets => {
     y: XSHIP_Y
   });
 
-  const initialShipState = {
-    isDestroyed: false,
-
-  };
   const defaultAmmo = generateBullets(MAX_BULLETS, scene);
   const defaultEnemies = generateEnemies(ENEMIES_WAVE, xTriangle, scene);
   const sphereBg = addSphereBg(sphereBgGeo, scene);
