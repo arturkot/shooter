@@ -66,7 +66,7 @@ parsedResults.then(assets => {
 function render(scene, camera, {
   enemies, sphereBg, ammo, xShip,
   defaultEnemies, defaultAmmo, score,
-  state
+  state, enemiesHit = []
 } = {}) {
   renderer.render(scene, camera);
 
@@ -138,7 +138,6 @@ function render(scene, camera, {
   }
 
   if (state === GAME_STATE) {
-    let enemiesHit = [];
     const freeBulletId = getFreeBulletId(ammo, isShoot);
     const freeEnemyId = getFreeEnemyId(enemies);
 
