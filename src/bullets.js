@@ -44,7 +44,8 @@ export function getFreeBulletId (ammo, isShoot) {
 
 export function updateBullet ({
   bullet, index, enemies, bulletSpeed,
-  x, defaultY, maxBulletsOnScreen, freeBulletId
+  x, defaultY, maxBulletsOnScreen, freeBulletId,
+  bulletEmittedCallback
 }) {
   const thisBullet = Object.assign({}, bullet)
 
@@ -63,6 +64,9 @@ export function updateBullet ({
     thisBullet.x = x;
     thisBullet.y = defaultY + 0.9;
     thisBullet.emittedAt = Date.now();
+    if (bulletEmittedCallback) {
+      bulletEmittedCallback(thisBullet);
+    }
   }
 
   return thisBullet;

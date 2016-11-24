@@ -17,6 +17,7 @@ import { addSphereBg, animateSphereBg } from "./sphereBg";
 import { leftBoundry, rightBoundry, addboundaries } from "./boundaries";
 import { parsedResults } from "./getAssets";
 import { updateScore, updateHiScore } from "./score";
+import { blasterSound, hitSound, wooshSound, explosionSound } from "./sounds";
 
 const INITIAL_STATE = 'splash screen';
 const GAME_STATE = 'game loop';
@@ -158,7 +159,10 @@ function render(scene, camera, {
         x: xShip.position.x,
         defaultY: XSHIP_Y,
         bulletSpeed: BULLET_SPEED,
-        maxBulletsOnScreen: MAX_BULLETS_ON_SCREEN
+        maxBulletsOnScreen: MAX_BULLETS_ON_SCREEN,
+        bulletEmittedCallback: () => {
+          blasterSound.seek(0).play();
+        }
       }) )
       .map( bullet => detectBulletCollisionAgainstEnemies({
         bullet, enemies, scene,
@@ -169,7 +173,9 @@ function render(scene, camera, {
       }) );
 
     const newEnemies = rebornEnemies(enemies)
-      .map( enemy => handleEnemyCollision(enemy, enemiesHit) )
+      .map( enemy => handleEnemyCollision(enemy, enemiesHit, () => {
+        hitSound.seek(0).play();
+      }) )
       .map( enemy => updateEnemy({
         enemy, freeEnemyId, leftBoundry, rightBoundry,
         top: TOP,
@@ -178,6 +184,10 @@ function render(scene, camera, {
           resetUserEvents();
           state = GAME_OVER_STATE;
           updateHiScore({ hiScoreEl, score });
+          wooshSound.seek(0).play();
+        },
+        destroyedCallback: () => {
+          explosionSound.seek(0).play();
         }
       }) );
 

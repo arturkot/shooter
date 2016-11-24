@@ -105,7 +105,7 @@ export function rebornEnemies (enemies) {
 
 export function updateEnemy ({
   enemy, freeEnemyId, top, bottom, leftBoundry, rightBoundry,
-  gotPastScreenCallback
+  gotPastScreenCallback, destroyedCallback
 } = {}) {
   const thisEnemy = Object.assign({}, enemy);
 
@@ -123,6 +123,9 @@ export function updateEnemy ({
 
   if (thisEnemy.energy <= 0) {
     thisEnemy.isDestroyed = true;
+    if (destroyedCallback) {
+      destroyedCallback(thisEnemy);
+    }
   }
 
   if (thisEnemy.isDestroyed) {
@@ -147,11 +150,14 @@ export function updateEnemy ({
   return thisEnemy;
 }
 
-export function handleEnemyCollision (enemy, enemiesHit) {
+export function handleEnemyCollision (enemy, enemiesHit, hitCallback) {
   const thisEnemy = Object.assign({}, enemy);
 
   if ( enemiesHit.some( enemyId => enemyId === enemy.id) ) {
     thisEnemy.energy -= 1;
+    if (hitCallback) {
+      hitCallback(thisEnemy);
+    }
   }
 
   return thisEnemy;
