@@ -23,7 +23,6 @@ const INITIAL_STATE = 'splash screen';
 const GAME_STATE = 'game loop';
 const GAME_OVER_STATE = 'game over';
 const DEFAULT_SCORE = 0;
-const SPHERE_BG_URL = 'meshes/sphere-bg.json';
 const ENEMIES_WAVE = 24;
 const MAX_BULLETS = 11;
 const BULLET_SPEED = 0.3;
