@@ -1,19 +1,29 @@
+import * as settings from './settings';
 import { range } from "lodash";
-import { rangeIntersects, rectIntersect } from "./collisionDetection";
+import { Enemy } from "./enemies";
+import { rectIntersect } from "./collisionDetection";
 
-export function generateBullets (maxNr, scene) {
+export interface Bullet {
+  id: number;
+  x: number;
+  y: number;
+  height: number;
+  isActive: boolean;
+  emittedAt?: number;
+};
+
+export function generateBullets (maxNr: number, scene: THREE.Scene) {
   const OFFSCREEN = 9999;
-  const bullets = range(maxNr);
-
-  return bullets.map( () => {
-    const geometry = new THREE.ConeGeometry(0.1, 0.6, 8);;
+  const array = range(maxNr);
+  const bullets = array.map( () => {
+    const geometry = new THREE.ConeGeometry(0.1, 0.6, 8);
     const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
     const element = new THREE.Mesh(geometry, material);
 
     element.position.y = OFFSCREEN;
     scene.add(element);
 
-    return {
+    const bullet: Bullet = {
       id: element.id,
       x: OFFSCREEN,
       y: OFFSCREEN,
@@ -21,14 +31,20 @@ export function generateBullets (maxNr, scene) {
       isActive: false,
       emittedAt: undefined
     };
+
+    return bullet;
   });
+
+  return bullets;
 }
 
-export function getFreeBulletId (ammo, isShoot) {
-  if (!isShoot) { return; }
+export function getFreeBulletId (bullets: Bullet[], isShoot: boolean) {
+  const NON_EXISTENT_ID = -1;
+
+  if (!isShoot) { return NON_EXISTENT_ID; }
 
   const MIN_DELAY = 400;
-  const lastBullet = ammo
+  const lastBullet = bullets
     .filter( bullet => bullet.isActive )
     .sort( (bulletA, bulletB) => bulletB.emittedAt - bulletA.emittedAt)
     [0];
@@ -37,17 +53,28 @@ export function getFreeBulletId (ammo, isShoot) {
     !lastBullet ||
     Date.now() - lastBullet.emittedAt > MIN_DELAY
   ) {
-    const freeBullet = ammo.find( bullet => !bullet.isActive ) || {};
-    return freeBullet.id;
+    const freeBullet = bullets.find( bullet => !bullet.isActive );
+
+    if (freeBullet) {
+      return freeBullet.id;
+    }
   }
+
+  return NON_EXISTENT_ID;
 }
 
-export function updateBullet ({
-  bullet, index, enemies, bulletSpeed,
-  x, defaultY, maxBulletsOnScreen, freeBulletId,
+export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
+  defaultY = settings.XSHIP_Y,
+  bulletSpeed = settings.BULLET_SPEED,
+  maxBulletsOnScreen = settings.MAX_BULLETS_ON_SCREEN,
   bulletEmittedCallback
-}) {
-  const thisBullet = Object.assign({}, bullet)
+}: {
+  defaultY?: number;
+  bulletSpeed?: number;
+  maxBulletsOnScreen?: number;
+  bulletEmittedCallback?: (thisBullet: Bullet) => void;
+} = {}) {
+  const thisBullet = Object.assign({}, bullet);
 
   if (
     thisBullet.isActive &&
@@ -72,8 +99,10 @@ export function updateBullet ({
   return thisBullet;
 }
 
-export function detectBulletCollisionAgainstEnemies ({
-  bullet, enemies, scene, collisionCallback
+export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: Enemy[], scene: THREE.Scene, {
+  collisionCallback
+}: {
+  collisionCallback?: (enemy: Enemy) => void
 } = {}) {
   const thisBullet = Object.assign({}, bullet);
 
@@ -95,7 +124,7 @@ export function detectBulletCollisionAgainstEnemies ({
   return thisBullet;
 }
 
-export function updateBulletInScene (bullet, scene) {
+export function updateBulletInScene (bullet: Bullet, scene: THREE.Scene) {
   const OFFSCREEN = 9999;
   const element = scene.getObjectById(bullet.id);
 

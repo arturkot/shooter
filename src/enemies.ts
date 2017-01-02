@@ -1,16 +1,37 @@
+import * as settings from './settings';
 import { range, random } from "lodash";
 import { deg } from "./utils";
+import * as boundaries from "./boundaries";
 
+const OFFSCREEN = 9999;
 const MIN_REBORN_TIME = 500;
 const MAX_REBORN_TIME = 1000;
 const MIN_VELOCITY = 0.03;
 const MAX_VELOCITY = 0.05;
 
-export function generateEnemies (maxNr, xTriangle, scene) {
-  const OFFSCREEN = 9999;
-  const enemies = range(maxNr);
+export interface Enemy {
+  id: number;
+  x: number;
+  y: number;
+  opacity: number;
+  rotation: number;
+  isActive: boolean;
+  isUsed: boolean;
+  isDestroyed: boolean;
+  energy: number;
+  initialEnergy: number;
+  emittedAt?: number;
+  level: number;
+  sideForce: number;
+  velocity: number;
+  delay: number;
+  score: number;
+};
 
-  return enemies.map( (nr) => {
+export function generateEnemies (maxNr: number, xTriangle: THREE.Geometry, scene: THREE.Scene) {
+  const array = range(maxNr);
+
+  const enemies: Enemy[] = array.map( (): Enemy => {
     const DEFAULT_ENERGY = 1;
     const DEFAULT_LEVEL = 1;
     const DEFAULT_SIDE_FORCE = 0;
@@ -61,7 +82,6 @@ export function generateEnemies (maxNr, xTriangle, scene) {
       isDestroyed: false,
       energy: DEFAULT_ENERGY,
       initialEnergy: DEFAULT_ENERGY,
-      emittedAt: undefined,
       level: DEFAULT_LEVEL,
       sideForce: DEFAULT_SIDE_FORCE,
       velocity,
@@ -74,9 +94,14 @@ export function generateEnemies (maxNr, xTriangle, scene) {
       })
     };
   });
+
+  return enemies;
 }
 
-export function getFreeEnemyId (enemies) {
+export function getFreeEnemyId (enemies?: Enemy[]) {
+  if (!enemies) { return -1; }
+
+  const NON_EXISTENT_ID = -1;
   const lastEnemy = enemies
     .filter( enemy => enemy.isActive )
     .sort( (enemyA, enemyB) => enemyB.emittedAt - enemyA.emittedAt)
@@ -88,13 +113,17 @@ export function getFreeEnemyId (enemies) {
   ) {
     const freeEnemy = enemies
       .filter( enemy => !enemy.isUsed)
-      .find( enemy => !enemy.isActive) || {};
+      .find( enemy => !enemy.isActive);
 
-    return freeEnemy.id;
+    if (freeEnemy) {
+      return freeEnemy.id;
+    }
   }
+
+  return NON_EXISTENT_ID;
 }
 
-export function rebornEnemies (enemies) {
+export function rebornEnemies (enemies: Enemy[]) {
     if (enemies.every( enemy => enemy.isUsed ) ) {
       return enemies
         .map( enemy => Object.assign({}, enemy, { isUsed: false }) );
@@ -103,9 +132,20 @@ export function rebornEnemies (enemies) {
     return enemies;
 }
 
-export function updateEnemy ({
-  enemy, freeEnemyId, top, bottom, leftBoundry, rightBoundry,
-  gotPastScreenCallback, destroyedCallback
+export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
+  top = settings.TOP,
+  bottom = settings.BOTTOM,
+  leftBoundry = boundaries.leftBoundry,
+  rightBoundry = boundaries.rightBoundry,
+  gotPastScreenCallback,
+  destroyedCallback
+}: {
+  top?: number,
+  bottom?: number,
+  leftBoundry?: number,
+  rightBoundry?: number,
+  gotPastScreenCallback?: (thisEnemy: Enemy) => void,
+  destroyedCallback?: (thisEnemy: Enemy) => void
 } = {}) {
   const thisEnemy = Object.assign({}, enemy);
 
@@ -117,7 +157,7 @@ export function updateEnemy ({
   }
 
   if (thisEnemy.y < bottom) {
-    if (gotPastScreenCallback) { gotPastScreenCallback(); }
+    if (gotPastScreenCallback) { gotPastScreenCallback(thisEnemy); }
     return rebuildEnemy(thisEnemy);
   }
 
@@ -150,7 +190,10 @@ export function updateEnemy ({
   return thisEnemy;
 }
 
-export function handleEnemyCollision (enemy, enemiesHit, hitCallback) {
+export function handleEnemyCollision (
+  enemy: Enemy, enemiesHit: number[],
+  hitCallback: (thisEnemy: Enemy) => void
+) {
   const thisEnemy = Object.assign({}, enemy);
 
   if ( enemiesHit.some( enemyId => enemyId === enemy.id) ) {
@@ -163,7 +206,7 @@ export function handleEnemyCollision (enemy, enemiesHit, hitCallback) {
   return thisEnemy;
 }
 
-export function rebuildEnemy (enemy) {
+export function rebuildEnemy (enemy: Enemy): Enemy {
   const minDelay = Math.max(MIN_REBORN_TIME - enemy.level * 10, 300);
   const maxDelay = Math.max(MAX_REBORN_TIME - enemy.level * 10, 500);
   const maxVelocity = Math.min(MAX_VELOCITY + (enemy.level * 2) / 100, 0.1);
@@ -172,8 +215,10 @@ export function rebuildEnemy (enemy) {
   const sideForce = energy > 1 ? 0 : random(-0.1, 0.1, true);
   const level = enemy.level + 1;
 
-  return Object.assign({}, enemy, {
-    y: top,
+  return {
+    x: OFFSCREEN,
+    y: OFFSCREEN,
+    id: enemy.id,
     opacity: 1,
     rotation: 0,
     isActive: false,
@@ -190,12 +235,12 @@ export function rebuildEnemy (enemy) {
       velocity, sideForce, level,
       initialEnergy: energy
     })
-  });
-}
+  };
+};
 
-export function updateEnemyInScene (enemy, scene) {
+export function updateEnemyInScene (enemy: Enemy, scene: THREE.Scene) {
   const OFFSCREEN = 9999;
-  const element = scene.getObjectById(enemy.id);
+  const element = scene.getObjectById(enemy.id) as THREE.Mesh;
 
   if (enemy.isDestroyed) {
     element.scale.x = random(0.9, 2, true);
@@ -209,23 +254,24 @@ export function updateEnemyInScene (enemy, scene) {
     element.position.x = enemy.x;
     element.position.y = enemy.y;
     element.rotation.z = enemy.rotation;
-    element.children.forEach( child => {
+    element.children.forEach( (child: THREE.Mesh) => {
       child.material.opacity = enemy.opacity;
     });
-    _updateColor(element, enemy);
+    _updateColors(element, enemy);
   } else {
     element.position.y = OFFSCREEN;
   }
 }
 
-export function resetEnemiesAppearanceInScene (enemies, scene) {
+export function resetEnemiesAppearanceInScene (enemies: Enemy[], scene: THREE.Scene) {
   enemies.forEach( enemy => {
-    const element = scene.getObjectById(enemy.id);
-    element.material.color.setHex(0x2C88D8);
+    const element = scene.getObjectById(enemy.id) as THREE.Mesh;
+    const material = element.material as THREE.MeshBasicMaterial;
+    material.color.setHex(0x2C88D8);
   });
 }
 
-function _getVelocity (energy, maxVelocity, level) {
+function _getVelocity (energy: number, maxVelocity: number, level: number) {
   switch (energy) {
     case 1:
       return random(MIN_VELOCITY + level / 40, maxVelocity, true);
@@ -233,35 +279,58 @@ function _getVelocity (energy, maxVelocity, level) {
       return random(MIN_VELOCITY, MIN_VELOCITY + 0.01, true);
     case 3:
       return MIN_VELOCITY;
+    default:
+      return 0;
   }
 }
 
-function _updateColor (element, enemy) {
+function _updateColors (element: THREE.Mesh, enemy: Enemy) {
   const { energy, velocity } = enemy;
 
   if (velocity > 0.1) {
-    element.children.forEach( child => child.material.color.setHex(0xDB3AD0) );
+    _updateChildrenColor(element, 0xDB3AD0);
   } else {
-    element.children.forEach( child => child.material.color.setHex(0x78A5EC) );
+    _updateChildrenColor(element, 0x78A5EC);
   }
 
   if (enemy.isDestroyed) {
-    element.children.forEach( child => child.material.color.setHex(0xFF0000) );
+    _updateChildrenColor(element, 0xFF0000);
   }
 
   switch (energy) {
     case 3:
-      element.children.forEach( child => child.material.emissive.setHex(0xB7BBC0) );
+      _updateChildrenEmissive(element, 0xB7BBC0);
       break;
     case 2:
-      element.children.forEach( child => child.material.emissive.setHex(0x73ADCF) );
+      _updateChildrenEmissive(element, 0x73ADCF);
       break;
     default:
-      element.children.forEach( child => child.material.emissive.setHex(0x000000) );
+      _updateChildrenEmissive(element, 0x000000);
   }
 }
 
-function _calculateScore ({ velocity, sideForce, level, initialEnergy } = {}) {
+function _updateChildrenColor (element: THREE.Mesh, color: number) {
+  element.children.forEach( (child: THREE.Mesh) => {
+    const material = child.material as THREE.MeshPhongMaterial;
+    material.color.setHex(color);
+  } );
+}
+
+function _updateChildrenEmissive (element: THREE.Mesh, color: number) {
+  element.children.forEach( (child: THREE.Mesh) => {
+    const material = child.material as THREE.MeshPhongMaterial;
+    material.emissive.setHex(color);
+  } );
+}
+
+function _calculateScore (
+  { velocity, sideForce, level, initialEnergy }: {
+    velocity: number,
+    sideForce: number,
+    level: number,
+    initialEnergy: number
+  }
+) {
   const velocityScore = velocity || 1;
   const sideForceScore = sideForce || 1;
   const score = Math.ceil(level + velocityScore * 10 + sideForceScore * 10 + initialEnergy);

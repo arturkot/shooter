@@ -15,7 +15,7 @@ export function resetUserEvents () {
   isShoot = false;
 }
 
-function handleKeydown (event) {
+function handleKeydown (event: KeyboardEvent) {
   const { keyCode } = event;
 
   switch (keyCode) {
@@ -30,7 +30,7 @@ function handleKeydown (event) {
   }
 }
 
-function handleKeyup (event) {
+function handleKeyup (event: KeyboardEvent) {
   const { keyCode } = event;
 
   switch (keyCode) {

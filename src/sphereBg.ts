@@ -1,11 +1,11 @@
 import { deg } from "./utils";
 
-export function animateSphereBg (sphereBg) {
+export function animateSphereBg (sphereBg: THREE.Mesh) {
   sphereBg.rotation.x  += -0.01;
   sphereBg.rotation.z  += -0.001;
 }
 
-export function addSphereBg (geometry, scene) {
+export function addSphereBg (geometry: THREE.Geometry, scene: THREE.Scene) {
   const material = new THREE.MeshPhongMaterial({
     color: 0x0B1687,
     side: THREE.BackSide,

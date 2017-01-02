@@ -1,15 +1,17 @@
 import { range } from "lodash";
 
-export function updateScore (scoreEl, score) {
+export function updateScore (scoreEl: Element | null, score?: number) {
+  if (!scoreEl || !score) { return; }
   scoreEl.textContent = _formatScore(score);
 }
 
-export function updateHiScore ({ hiScoreEl, score }) {
+export function updateHiScore (hiScoreEl: Element | null, score: number) {
   const HI_SCORE_KEY = 'hi-score';
-  const hiScore = parseInt( localStorage.getItem(HI_SCORE_KEY), 10) || 0;
+  const scoreString = String( localStorage.getItem(HI_SCORE_KEY) );
+  const hiScore = parseInt(scoreString, 10) || 0;
 
   if (score !== undefined && hiScore < score) {
-    localStorage.setItem(HI_SCORE_KEY, score);
+    localStorage.setItem(HI_SCORE_KEY, String(score) );
   }
 
   if (hiScoreEl) {
@@ -17,7 +19,7 @@ export function updateHiScore ({ hiScoreEl, score }) {
   }
 }
 
-function _formatScore(score) {
+function _formatScore(score: number) {
   const MAX_WIDTH = 4;
   const scoreString = String(score);
   const zeros = range(MAX_WIDTH - scoreString.length).map( () => 0 ).join('');
