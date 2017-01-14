@@ -10,22 +10,22 @@ const MIN_VELOCITY = 0.03;
 const MAX_VELOCITY = 0.05;
 
 export interface Enemy {
-  id: number;
-  x: number;
-  y: number;
-  opacity: number;
-  rotation: number;
-  isActive: boolean;
-  isUsed: boolean;
-  isDestroyed: boolean;
-  energy: number;
-  initialEnergy: number;
-  emittedAt?: number;
-  level: number;
-  sideForce: number;
-  velocity: number;
-  delay: number;
-  score: number;
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  readonly opacity: number;
+  readonly rotation: number;
+  readonly isActive: boolean;
+  readonly isUsed: boolean;
+  readonly isDestroyed: boolean;
+  readonly energy: number;
+  readonly initialEnergy: number;
+  readonly emittedAt?: number;
+  readonly level: number;
+  readonly sideForce: number;
+  readonly velocity: number;
+  readonly delay: number;
+  readonly score: number;
 };
 
 export function generateEnemies (maxNr: number, xTriangle: THREE.Geometry, scene: THREE.Scene) {
@@ -147,63 +147,76 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
   gotPastScreenCallback?: (thisEnemy: Enemy) => void,
   destroyedCallback?: (thisEnemy: Enemy) => void
 } = {}) {
-  const thisEnemy = Object.assign({}, enemy);
-
-  if (freeEnemyId === thisEnemy.id) {
-    thisEnemy.x = random(leftBoundry, rightBoundry, true);
-    thisEnemy.y = top;
-    thisEnemy.isActive = true;
-    thisEnemy.emittedAt = Date.now();
+  if (enemy.y < bottom) {
+    if (gotPastScreenCallback) { gotPastScreenCallback(enemy); }
+    return rebuildEnemy(enemy);
   }
 
-  if (thisEnemy.y < bottom) {
-    if (gotPastScreenCallback) { gotPastScreenCallback(thisEnemy); }
-    return rebuildEnemy(thisEnemy);
+  if (enemy.isDestroyed && enemy.opacity <= 0) {
+    return rebuildEnemy(enemy);
   }
 
-  if (thisEnemy.energy <= 0) {
-    thisEnemy.isDestroyed = true;
+  if (freeEnemyId === enemy.id) {
+    return {
+      ...enemy,
+      x: random(leftBoundry, rightBoundry, true),
+      y: top,
+      isActive: true,
+      emittedAt: Date.now()
+    };
+  }
+
+  const updatedEnemy = {
+    x: enemy.x,
+    y: enemy.y,
+    rotation: enemy.rotation,
+    isDestroyed: enemy.isDestroyed,
+    opacity: enemy.opacity,
+    sideForce: enemy.sideForce
+  };
+
+  if (enemy.energy <= 0 && !enemy.isDestroyed) {
+    updatedEnemy.isDestroyed = true;
+    updatedEnemy.opacity -= 0.1;
+
     if (destroyedCallback) {
-      destroyedCallback(thisEnemy);
+      destroyedCallback(enemy);
     }
   }
 
-  if (thisEnemy.isDestroyed) {
-    thisEnemy.opacity -= 0.1;
+  if (enemy.isDestroyed) {
+    updatedEnemy.opacity -= 0.1;
   }
 
-  if (thisEnemy.isDestroyed && thisEnemy.opacity <= 0) {
-    return rebuildEnemy(thisEnemy);
+  if ( updatedEnemy.x < leftBoundry || updatedEnemy.x > rightBoundry ) {
+    updatedEnemy.sideForce *= -1;
   }
 
-  if (
-    thisEnemy.x < leftBoundry ||
-    thisEnemy.x > rightBoundry
-  ) {
-    thisEnemy.sideForce *= -1;
-  }
+  updatedEnemy.x += updatedEnemy.sideForce;
+  updatedEnemy.y -= enemy.velocity;
+  updatedEnemy.rotation += deg(updatedEnemy.sideForce * 10);
 
-  thisEnemy.x += thisEnemy.sideForce;
-  thisEnemy.y -= thisEnemy.velocity;
-  thisEnemy.rotation += deg(thisEnemy.sideForce * 10);
-
-  return thisEnemy;
+  return {
+    ...enemy,
+    ...updatedEnemy
+  };
 }
 
 export function handleEnemyCollision (
   enemy: Enemy, enemiesHit: number[],
   hitCallback: (thisEnemy: Enemy) => void
 ) {
-  const thisEnemy = Object.assign({}, enemy);
+  let { energy } = enemy;
 
   if ( enemiesHit.some( enemyId => enemyId === enemy.id) ) {
-    thisEnemy.energy -= 1;
+    energy -= 1;
+
     if (hitCallback) {
-      hitCallback(thisEnemy);
+      hitCallback(enemy);
     }
   }
 
-  return thisEnemy;
+  return { ...enemy, energy };
 }
 
 export function rebuildEnemy (enemy: Enemy): Enemy {

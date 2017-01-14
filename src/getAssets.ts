@@ -29,7 +29,7 @@ function loadAsset (url: string) {
 
 function parseResults (results: THREE.Geometry[], aliases: string[]) {
    interface GeometriesDictionary {
-     [key: string]: THREE.Geometry
+     [key: string]: THREE.Geometry;
    };
 
   const parsedResults: GeometriesDictionary = results

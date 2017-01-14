@@ -4,12 +4,12 @@ import { Enemy } from "./enemies";
 import { rectIntersect } from "./collisionDetection";
 
 export interface Bullet {
-  id: number;
-  x: number;
-  y: number;
-  height: number;
-  isActive: boolean;
-  emittedAt?: number;
+  readonly id: number;
+  readonly x: number;
+  readonly y: number;
+  readonly height: number;
+  readonly isActive: boolean;
+  readonly emittedAt?: number;
 };
 
 export function generateBullets (maxNr: number, scene: THREE.Scene) {
@@ -74,29 +74,38 @@ export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
   maxBulletsOnScreen?: number;
   bulletEmittedCallback?: (thisBullet: Bullet) => void;
 } = {}) {
-  const thisBullet = Object.assign({}, bullet);
+  const updatedBullet = {
+    x: bullet.x,
+    y: bullet.y,
+    isActive: bullet.isActive,
+    emittedAt: bullet.emittedAt
+  };
 
   if (
-    thisBullet.isActive &&
-    thisBullet.y > thisBullet.height * maxBulletsOnScreen) {
-    thisBullet.isActive = false;
+    bullet.isActive &&
+    bullet.y > bullet.height * maxBulletsOnScreen) {
+    updatedBullet.isActive = false;
   }
 
-  if (thisBullet.isActive) {
-    thisBullet.y += bulletSpeed;
+  if (bullet.isActive) {
+    updatedBullet.y += bulletSpeed;
   }
 
-  if (thisBullet.id === freeBulletId) {
-    thisBullet.isActive = true;
-    thisBullet.x = x;
-    thisBullet.y = defaultY + 0.9;
-    thisBullet.emittedAt = Date.now();
+  if (bullet.id === freeBulletId) {
+    updatedBullet.isActive = true;
+    updatedBullet.x = x;
+    updatedBullet.y = defaultY + 0.9;
+    updatedBullet.emittedAt = Date.now();
+
     if (bulletEmittedCallback) {
-      bulletEmittedCallback(thisBullet);
+      bulletEmittedCallback(bullet);
     }
   }
 
-  return thisBullet;
+  return {
+    ...bullet,
+    ...updatedBullet
+  };
 }
 
 export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: Enemy[], scene: THREE.Scene, {
@@ -104,16 +113,16 @@ export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: En
 }: {
   collisionCallback?: (enemy: Enemy) => void
 } = {}) {
-  const thisBullet = Object.assign({}, bullet);
+  let { isActive } = bullet;
 
   enemies.filter(enemy => enemy.isActive).forEach(enemy => {
     const enemyElement = scene.getObjectById(enemy.id);
-    const bulletElement = scene.getObjectById(thisBullet.id);
+    const bulletElement = scene.getObjectById(bullet.id);
     const enemyBox = new THREE.Box3().setFromObject(enemyElement);
     const bulletBox = new THREE.Box3().setFromObject(bulletElement);
 
     if ( rectIntersect(enemyBox, bulletBox) ) {
-      thisBullet.isActive = false;
+      isActive = false;
 
       if (collisionCallback) {
         collisionCallback(enemy);
@@ -121,7 +130,7 @@ export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: En
     }
   });
 
-  return thisBullet;
+  return { ...bullet, isActive };
 }
 
 export function updateBulletInScene (bullet: Bullet, scene: THREE.Scene) {
