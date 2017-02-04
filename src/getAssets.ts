@@ -1,3 +1,7 @@
+export interface GeometriesDictionary {
+  [key: string]: THREE.Geometry;
+};
+
 const loader = new THREE.JSONLoader();
 const aliases = [
   'xShipCloud',
@@ -19,19 +23,23 @@ const urls = [
 const promises = urls.map(loadAsset);
 const parsedResults = Promise
   .all(promises)
-  .then( results => parseResults(results, aliases) );
+  .then( (results: THREE.Geometry[]) => parseResults(results, aliases) );
 
-function loadAsset (url) {
+function loadAsset (url: string) {
   return new Promise(resolve => {
     loader.load( url, geometry => resolve(geometry) );
   });
 }
 
-function parseResults (results, aliases) {
-  return results.reduce( (obj, result, index) => {
-    obj[aliases[index]] = result;
-    return obj;
-  }, {});
+function parseResults (results: THREE.Geometry[], aliases: string[]) {
+  const parsedResults: GeometriesDictionary = results
+    .reduce( (obj: GeometriesDictionary, result, index) => {
+      const alias = aliases[index];
+      obj[alias] = result;
+      return obj;
+    }, {});
+
+  return parsedResults;
 }
 
 export { promises, parsedResults };

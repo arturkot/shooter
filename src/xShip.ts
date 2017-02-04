@@ -1,11 +1,18 @@
+import { Enemy } from "./enemies";
 import { random } from "lodash";
 import { deg } from "./utils";
-import { rangeIntersects, rectIntersect } from "./collisionDetection";
+import { rectIntersect } from "./collisionDetection";
+import * as boundaries from "./boundaries";
 
 export function addXShip ({
-    xShipCloud, xShipBody, xShipRear,
-    xTriangle, xChunk, scene, y
-} = {}) {
+    xShipCloud, xShipBody,
+    xShipRear, xTriangle,
+    xChunk, scene, shipPositionY
+}: {
+  xShipCloud: THREE.Geometry, xShipBody: THREE.Geometry,
+  xShipRear: THREE.Geometry, xTriangle: THREE.Geometry,
+  xChunk: THREE.Geometry, scene: THREE.Scene, shipPositionY: number
+}) {
   const collisionGeometry = new THREE.BoxGeometry(0.5, 0.001, 0.1);
   const parentGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
   const parentMaterial = new THREE.MeshBasicMaterial({
@@ -52,7 +59,7 @@ export function addXShip ({
   exhaustC.position.x = 0.2;
   exhaustC.position.y = -0.55;
 
-  xShip.position.y = y;
+  xShip.position.y = shipPositionY;
   scene.add(xShip);
   xShip.add(xCloud);
   xShip.add(xTopRight);
@@ -68,11 +75,13 @@ export function addXShip ({
   return xShip;
 }
 
-export function moveXShip ({
-  xShip, leftBoundry, rightBoundry,
-  isMoveLeft = false,
-  isMoveRight = false,
-}) {
+export function moveXShip (xShip: THREE.Mesh, isMoveLeft = false, isMoveRight = false, {
+  leftBoundry = boundaries.leftBoundry,
+  rightBoundry = boundaries.rightBoundry
+}: {
+  leftBoundry?: number,
+  rightBoundry?: number
+} = {}) {
   const MAX_ROTATION = 45;
   const ROTATION_SPEED = 1.4;
 
@@ -112,19 +121,19 @@ export function moveXShip ({
   exhaustC.scale.y = random(0.8, 1.1, true);
 }
 
-export function resetXShip (xShip, y) {
+export function resetXShip (xShip: THREE.Mesh, y: number) {
   xShip.rotation.y = 0;
   xShip.scale.x = 1;
   xShip.scale.y = 1;
   xShip.scale.z = 1;
   xShip.position.y = y;
 
-  xShip.children.forEach(child => {
+  xShip.children.forEach( (child: THREE.Mesh) => {
     child.material.opacity = 1;
   });
 }
 
-export function destroyXShip (xShip) {
+export function destroyXShip (xShip: THREE.Mesh) {
   if (xShip.scale.x >= 0) {
     xShip.rotation.y += 0.1;
     xShip.scale.x -= 0.01;
@@ -132,14 +141,16 @@ export function destroyXShip (xShip) {
     xShip.scale.z -= 0.01;
     xShip.position.y += 0.1;
 
-    xShip.children.forEach(child => {
+    xShip.children.forEach( (child: THREE.Mesh) => {
       child.material.opacity -= 0.01;
     });
   }
 }
 
-export function detectBulletCollisionAgainstXShip ({
-  xShip, enemies, scene, collisionCallback
+export function detectBulletCollisionAgainstXShip (xShip: THREE.Mesh, enemies: Enemy[], scene: THREE.Scene, {
+  collisionCallback
+}: {
+  collisionCallback?: (enemy: Enemy) => void
 } = {}) {
   enemies.filter(enemy => enemy.isActive).forEach(enemy => {
     const enemyElement = scene.getObjectById(enemy.id);
@@ -155,7 +166,7 @@ export function detectBulletCollisionAgainstXShip ({
   });
 }
 
-function _getXCloud (xShipCloud) {
+function _getXCloud (xShipCloud: THREE.Geometry) {
   const material = new THREE.MeshPhongMaterial({
     color: 0xEC4D2E,
     specular: 0xEE6760,
@@ -168,7 +179,7 @@ function _getXCloud (xShipCloud) {
   return element;
 }
 
-function _getXPart (xChunk) {
+function _getXPart (xChunk: THREE.Geometry) {
   const material = new THREE.MeshPhongMaterial({
     color: 0xffffff,
     side: THREE.BackSide,
@@ -180,7 +191,7 @@ function _getXPart (xChunk) {
   return element;
 }
 
-function _getXBody (xBody) {
+function _getXBody (xBody: THREE.Geometry) {
   const material = new THREE.MeshPhongMaterial({
     color: 0xffffff,
     transparent: true
@@ -191,7 +202,7 @@ function _getXBody (xBody) {
   return element;
 }
 
-function _getXRear (zRear) {
+function _getXRear (zRear: THREE.Geometry) {
   const material = new THREE.MeshBasicMaterial({
     color: 0x0EFFFF,
     transparent: true

@@ -1,20 +1,21 @@
 module.exports = {
-  entry: "./src/main.js",
+  entry: "./src/main.ts",
   output: {
       filename: "./dist/main.js"
   },
+  resolve: {
+    extensions: ["", ".webpack.js", ".web.js", ".ts", ".tsx", ".js"]
+  },
+  devtool: 'eval-source-map',
   module: {
     loaders: [
       {
-        test: /.js$/,
-        loader: 'babel-loader',
-        exclude: /(node_modules|bower_components)/,
-        query: {
-          presets: ['es2015']
-        }
+        test: /\.tsx?$/,
+        loader: "ts-loader"
       }
     ]
   },
-
-  devServer: { inline: true }
+  devServer: {
+    inline: true
+  }
 };

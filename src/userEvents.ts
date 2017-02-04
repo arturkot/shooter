@@ -6,16 +6,30 @@ const SPACE = 32;
 const ARROW_LEFT = 37;
 const ARROW_RIGHT = 39;
 
-window.addEventListener('keydown', handleKeydown, false);
-window.addEventListener('keyup', handleKeyup, false);
+addEvents();
 
-export function resetUserEvents () {
+function addEvents () {
+  window.addEventListener('keydown', handleKeydown, false);
+  window.addEventListener('keyup', handleKeyup, false);
+}
+
+function removeEvents () {
+    window.removeEventListener('keydown', handleKeydown, false);
+    window.removeEventListener('keyup', handleKeyup, false);
+}
+
+export function resetUserEvents (time: number = 1000) {
   isMoveLeft = false;
   isMoveRight = false;
   isShoot = false;
+
+  if (time) {
+    removeEvents();
+    setTimeout(addEvents, time)
+  }
 }
 
-function handleKeydown (event) {
+function handleKeydown (event: KeyboardEvent) {
   const { keyCode } = event;
 
   switch (keyCode) {
@@ -30,7 +44,7 @@ function handleKeydown (event) {
   }
 }
 
-function handleKeyup (event) {
+function handleKeyup (event: KeyboardEvent) {
   const { keyCode } = event;
 
   switch (keyCode) {
