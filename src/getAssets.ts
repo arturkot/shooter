@@ -1,3 +1,7 @@
+export interface GeometriesDictionary {
+  [key: string]: THREE.Geometry;
+};
+
 const loader = new THREE.JSONLoader();
 const aliases = [
   'xShipCloud',
@@ -28,10 +32,6 @@ function loadAsset (url: string) {
 }
 
 function parseResults (results: THREE.Geometry[], aliases: string[]) {
-   interface GeometriesDictionary {
-     [key: string]: THREE.Geometry;
-   };
-
   const parsedResults: GeometriesDictionary = results
     .reduce( (obj: GeometriesDictionary, result, index) => {
       const alias = aliases[index];
