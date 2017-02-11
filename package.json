@@ -1,5 +1,5 @@
 {
-  "name": "Shooter",
+  "name": "shooter",
   "version": "0.0.0",
   "description": "Simple top-down shooter",
   "main": "index.js",
