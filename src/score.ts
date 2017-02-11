@@ -7,11 +7,15 @@ export function updateScore (scoreEl: Element | null, score: number) {
 }
 
 export function updateHiScore (hiScoreEl: Element | null, score: number) {
+  const DEFAULT_HI_SCORE = '0000';
   const HI_SCORE_KEY = 'hi-score';
-  const scoreString = String( localStorage.getItem(HI_SCORE_KEY) );
+  const isLocalStorage = checkIfLocalStorageAvailable();
+  const scoreString = isLocalStorage ?
+    String( localStorage.getItem(HI_SCORE_KEY) ) :
+    DEFAULT_HI_SCORE;
   const hiScore = parseInt(scoreString, 10) || 0;
 
-  if (hiScore < score) {
+  if (isLocalStorage && hiScore < score) {
     localStorage.setItem(HI_SCORE_KEY, String(score) );
     updateElement(hiScoreEl, score);
   } else {
@@ -31,4 +35,16 @@ function _formatScore(score: number) {
   const zeros = range(MAX_WIDTH - scoreString.length).map( () => 0 ).join('');
 
   return zeros + scoreString;
+}
+
+function checkIfLocalStorageAvailable() {
+  const LS_TEST_NAME = 'ls-test';
+
+  try {
+    localStorage.setItem(LS_TEST_NAME, LS_TEST_NAME);
+    localStorage.removeItem(LS_TEST_NAME);
+    return true;
+  } catch(e) {
+    return false;
+  }
 }
