@@ -24,8 +24,8 @@ export default function (initialGameState: GameState, els: Els, xShip: THREE.Mes
     gameOverEl.classList.remove('is-show');
   }
 
-  updateScore(scoreEl, initialGameState.score);
-  resetEnemiesAppearanceInScene(initialGameState.enemies, scene);
+  updateScore(scoreEl, score);
+  resetEnemiesAppearanceInScene(enemies, scene);
   resetXShip(xShip, settings.XSHIP_Y);
 
   enemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
