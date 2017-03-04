@@ -32,9 +32,6 @@ export function generateEnemies (maxNr: number, xTriangle: THREE.Geometry, scene
   const array = range(maxNr);
 
   const enemies: Enemy[] = array.map( (): Enemy => {
-    const DEFAULT_ENERGY = 1;
-    const DEFAULT_LEVEL = 1;
-    const DEFAULT_SIDE_FORCE = 0;
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshBasicMaterial({
       opacity: 0,
@@ -52,7 +49,6 @@ export function generateEnemies (maxNr: number, xTriangle: THREE.Geometry, scene
     const triangleA = new THREE.Mesh(xTriangle, xTriangleMaterial);
     const triangleB = new THREE.Mesh(xTriangle, xTriangleMaterial);
     const element = new THREE.Mesh(geometry, material);
-    const velocity = random(MIN_VELOCITY, MAX_VELOCITY, true);
 
     triangleA.position.x = -0.2;
     triangleA.rotation.x = deg(90);
@@ -71,37 +67,17 @@ export function generateEnemies (maxNr: number, xTriangle: THREE.Geometry, scene
     element.add(triangleA);
     element.add(triangleB);
 
-    return {
-      id: element.id,
-      x: OFFSCREEN,
-      y: OFFSCREEN,
-      opacity: 1,
-      rotation: 0,
-      isActive: false,
-      isUsed: false,
-      isDestroyed: false,
-      energy: DEFAULT_ENERGY,
-      initialEnergy: DEFAULT_ENERGY,
-      level: DEFAULT_LEVEL,
-      sideForce: DEFAULT_SIDE_FORCE,
-      velocity,
-      delay: random(MIN_REBORN_TIME, MAX_REBORN_TIME),
-      score: _calculateScore({
-        velocity,
-        initialEnergy: DEFAULT_ENERGY,
-        sideForce: DEFAULT_SIDE_FORCE,
-        level: DEFAULT_LEVEL
-      })
-    };
+    return getDefaultEnemy(element.id);
   });
 
   return enemies;
 }
 
 export function getFreeEnemyId (enemies?: Enemy[]) {
-  if (!enemies) { return -1; }
-
   const NON_EXISTENT_ID = -1;
+
+  if (!enemies) { return NON_EXISTENT_ID; }
+
   const lastEnemy = enemies
     .filter( enemy => enemy.isActive )
     .sort( (enemyA, enemyB) => enemyB.emittedAt - enemyA.emittedAt)
@@ -132,6 +108,31 @@ export function rebornEnemies (enemies: Enemy[]) {
     return enemies;
 }
 
+function _checkIfEnemyVanished (enemy: Enemy) {
+  return enemy.isDestroyed && enemy.opacity <=0;
+}
+
+function _getNewEnemyOpacity (enemy: Enemy) {
+  if (enemy.energy <= 0) {
+    const { opacity } = enemy;
+
+    delete enemy.opacity;
+    return opacity - 0.1;
+  }
+
+  return enemy.opacity;
+}
+
+function _getNewEnemySideforce (enemy: Enemy) {
+  const { leftBoundry, rightBoundry } = boundaries;
+
+  if ( enemy.x < leftBoundry || enemy.x > rightBoundry ) {
+    return enemy.sideForce * -1;
+  }
+
+  return enemy.sideForce;
+}
+
 export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
   top = settings.TOP,
   bottom = settings.BOTTOM,
@@ -152,7 +153,7 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
     return rebuildEnemy(enemy);
   }
 
-  if (enemy.isDestroyed && enemy.opacity <= 0) {
+  if ( _checkIfEnemyVanished(enemy) ) {
     return rebuildEnemy(enemy);
   }
 
@@ -166,39 +167,18 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
     };
   }
 
-  const updatedEnemy = {
-    x: enemy.x,
-    y: enemy.y,
-    rotation: enemy.rotation,
-    isDestroyed: enemy.isDestroyed,
-    opacity: enemy.opacity,
-    sideForce: enemy.sideForce
-  };
-
-  if (enemy.energy <= 0 && !enemy.isDestroyed) {
-    updatedEnemy.isDestroyed = true;
-    updatedEnemy.opacity -= 0.1;
-
-    if (destroyedCallback) {
-      destroyedCallback(enemy);
-    }
+  if (enemy.energy <= 0 && !enemy.isDestroyed && destroyedCallback) {
+    destroyedCallback(enemy);
   }
-
-  if (enemy.isDestroyed) {
-    updatedEnemy.opacity -= 0.1;
-  }
-
-  if ( updatedEnemy.x < leftBoundry || updatedEnemy.x > rightBoundry ) {
-    updatedEnemy.sideForce *= -1;
-  }
-
-  updatedEnemy.x += updatedEnemy.sideForce;
-  updatedEnemy.y -= enemy.velocity;
-  updatedEnemy.rotation += deg(updatedEnemy.sideForce * 10);
 
   return {
     ...enemy,
-    ...updatedEnemy
+    x: enemy.x + _getNewEnemySideforce(enemy),
+    y: enemy.y - enemy.velocity,
+    rotation: enemy.rotation + deg(_getNewEnemySideforce(enemy) * 10),
+    isDestroyed: enemy.energy <= 0,
+    opacity: _getNewEnemyOpacity(enemy),
+    sideForce: _getNewEnemySideforce(enemy)
   };
 }
 
@@ -227,11 +207,12 @@ export function rebuildEnemy (enemy: Enemy): Enemy {
   const velocity = _getVelocity(energy, maxVelocity, enemy.level);
   const sideForce = energy > 1 ? 0 : random(-0.1, 0.1, true);
   const level = enemy.level + 1;
+  const defaultEnemy = getDefaultEnemy(enemy.id);
 
   return {
+    ...defaultEnemy,
     x: OFFSCREEN,
     y: OFFSCREEN,
-    id: enemy.id,
     opacity: 1,
     rotation: 0,
     isActive: false,
@@ -250,6 +231,36 @@ export function rebuildEnemy (enemy: Enemy): Enemy {
     })
   };
 };
+
+export function getDefaultEnemy (id: number): Enemy {
+  const DEFAULT_ENERGY = 1;
+  const DEFAULT_LEVEL = 1;
+  const DEFAULT_SIDE_FORCE = 0;
+  const velocity = random(MIN_VELOCITY, MAX_VELOCITY, true);
+
+  return {
+    id,
+    x: OFFSCREEN,
+    y: OFFSCREEN,
+    opacity: 1,
+    rotation: 0,
+    isActive: false,
+    isUsed: false,
+    isDestroyed: false,
+    energy: DEFAULT_ENERGY,
+    initialEnergy: DEFAULT_ENERGY,
+    level: DEFAULT_LEVEL,
+    sideForce: DEFAULT_SIDE_FORCE,
+    velocity,
+    delay: random(MIN_REBORN_TIME, MAX_REBORN_TIME),
+    score: _calculateScore({
+      velocity,
+      initialEnergy: DEFAULT_ENERGY,
+      sideForce: DEFAULT_SIDE_FORCE,
+      level: DEFAULT_LEVEL
+    })
+  };
+}
 
 export function updateEnemyInScene (enemy: Enemy, scene: THREE.Scene) {
   const OFFSCREEN = 9999;
