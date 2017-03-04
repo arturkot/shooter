@@ -4,6 +4,7 @@
     "strictNullChecks": true,
     "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "lib": ["es6", "dom"]
+    "lib": ["es6", "dom"],
+    "target": "es5"
   }
 }
