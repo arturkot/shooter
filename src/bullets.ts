@@ -1,3 +1,4 @@
+import { update } from 'immupdate';
 import * as settings from './settings';
 import { range } from "lodash";
 import { Enemy } from "./enemies";
@@ -102,10 +103,7 @@ export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
     }
   }
 
-  return {
-    ...bullet,
-    ...updatedBullet
-  };
+  return update(bullet, updatedBullet);
 }
 
 export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: Enemy[], scene: THREE.Scene, {
@@ -130,7 +128,7 @@ export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: En
     }
   });
 
-  return { ...bullet, isActive };
+  return update(bullet, { isActive });
 }
 
 export function updateBulletInScene (bullet: Bullet, scene: THREE.Scene) {

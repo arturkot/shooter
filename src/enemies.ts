@@ -2,6 +2,7 @@ import * as settings from './settings';
 import { range, random } from "lodash";
 import { deg } from "./utils";
 import * as boundaries from "./boundaries";
+import { update } from 'immupdate';
 
 const OFFSCREEN = 9999;
 const MIN_REBORN_TIME = 500;
@@ -102,7 +103,7 @@ export function getFreeEnemyId (enemies?: Enemy[]) {
 export function rebornEnemies (enemies: Enemy[]) {
     if (enemies.every( enemy => enemy.isUsed ) ) {
       return enemies
-        .map( enemy => Object.assign({}, enemy, { isUsed: false }) );
+        .map( enemy => update(enemy, { isUsed: false }) );
     }
 
     return enemies;
@@ -158,28 +159,29 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
   }
 
   if (freeEnemyId === enemy.id) {
-    return {
-      ...enemy,
-      x: random(leftBoundry, rightBoundry, true),
-      y: top,
-      isActive: true,
-      emittedAt: Date.now()
-    };
+    return update(
+      enemy,
+      {
+        x: random(leftBoundry, rightBoundry, true),
+        y: top,
+        isActive: true,
+        emittedAt: Date.now()
+      }
+    );
   }
 
   if (enemy.energy <= 0 && !enemy.isDestroyed && destroyedCallback) {
     destroyedCallback(enemy);
   }
 
-  return {
-    ...enemy,
+  return update(enemy, {
     x: enemy.x + _getNewEnemySideforce(enemy),
     y: enemy.y - enemy.velocity,
     rotation: enemy.rotation + deg(_getNewEnemySideforce(enemy) * 10),
     isDestroyed: enemy.energy <= 0,
     opacity: _getNewEnemyOpacity(enemy),
     sideForce: _getNewEnemySideforce(enemy)
-  };
+  });
 }
 
 export function handleEnemyCollision (
@@ -196,7 +198,7 @@ export function handleEnemyCollision (
     }
   }
 
-  return { ...enemy, energy };
+  return update(enemy, { energy });
 }
 
 export function rebuildEnemy (enemy: Enemy): Enemy {
@@ -209,8 +211,7 @@ export function rebuildEnemy (enemy: Enemy): Enemy {
   const level = enemy.level + 1;
   const defaultEnemy = getDefaultEnemy(enemy.id);
 
-  return {
-    ...defaultEnemy,
+  return update(defaultEnemy, {
     x: OFFSCREEN,
     y: OFFSCREEN,
     opacity: 1,
@@ -229,7 +230,7 @@ export function rebuildEnemy (enemy: Enemy): Enemy {
       velocity, sideForce, level,
       initialEnergy: energy
     })
-  };
+  });
 };
 
 export function getDefaultEnemy (id: number): Enemy {
