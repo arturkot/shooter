@@ -10,6 +10,6 @@ describe('when enemy is updated', () => {
 
     updateEnemy(enemy, 99);
 
-    expect(enemy).toEqual(enemyClone)
+    expect(enemy).toEqual(enemyClone);
   });
 });

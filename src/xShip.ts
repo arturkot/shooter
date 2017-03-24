@@ -76,11 +76,11 @@ export function addXShip ({
 }
 
 export function moveXShip (xShip: THREE.Mesh, isMoveLeft = false, isMoveRight = false, {
-  leftBoundry = boundaries.leftBoundry,
-  rightBoundry = boundaries.rightBoundry
+  leftBoundary = boundaries.leftBoundary,
+  rightBoundary = boundaries.rightBoundary
 }: {
-  leftBoundry?: number,
-  rightBoundry?: number
+  leftBoundary?: number,
+  rightBoundary?: number
 } = {}) {
   const MAX_ROTATION = 45;
   const ROTATION_SPEED = 1.4;
@@ -90,16 +90,16 @@ export function moveXShip (xShip: THREE.Mesh, isMoveLeft = false, isMoveRight = 
   const exhaustC = xShip.getObjectByName('exhaustC');
 
   if (isMoveLeft) {
-    xShip.position.x = xShip.position.x <= leftBoundry ?
-      leftBoundry :
+    xShip.position.x = xShip.position.x <= leftBoundary ?
+      leftBoundary :
       xShip.position.x - 0.2;
 
     xShip.rotation.y = xShip.rotation.y <= deg(-MAX_ROTATION) ?
       deg(-MAX_ROTATION) :
       xShip.rotation.y - deg(ROTATION_SPEED);
   } else if (isMoveRight) {
-    xShip.position.x = xShip.position.x >= rightBoundry ?
-      rightBoundry :
+    xShip.position.x = xShip.position.x >= rightBoundary ?
+      rightBoundary :
       xShip.position.x + 0.2;
 
     xShip.rotation.y = xShip.rotation.y >= deg(MAX_ROTATION) ?

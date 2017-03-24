@@ -27,12 +27,12 @@ export interface Enemy {
   readonly velocity: number;
   readonly delay: number;
   readonly score: number;
-};
+}
 
 export function generateEnemies (maxNr: number, xTriangle: THREE.Geometry, scene: THREE.Scene) {
   const array = range(maxNr);
 
-  const enemies: Enemy[] = array.map( (): Enemy => {
+  return array.map( (): Enemy => {
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshBasicMaterial({
       opacity: 0,
@@ -70,8 +70,6 @@ export function generateEnemies (maxNr: number, xTriangle: THREE.Geometry, scene
 
     return getDefaultEnemy(element.id);
   });
-
-  return enemies;
 }
 
 export function getFreeEnemyId (enemies?: Enemy[]) {
@@ -124,10 +122,10 @@ function _getNewEnemyOpacity (enemy: Enemy) {
   return enemy.opacity;
 }
 
-function _getNewEnemySideforce (enemy: Enemy) {
-  const { leftBoundry, rightBoundry } = boundaries;
+function _getNewEnemySideforce(enemy: Enemy): number {
+  const {leftBoundary, rightBoundary} = boundaries;
 
-  if ( enemy.x < leftBoundry || enemy.x > rightBoundry ) {
+  if (enemy.x < leftBoundary || enemy.x > rightBoundary) {
     return enemy.sideForce * -1;
   }
 
@@ -137,15 +135,15 @@ function _getNewEnemySideforce (enemy: Enemy) {
 export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
   top = settings.TOP,
   bottom = settings.BOTTOM,
-  leftBoundry = boundaries.leftBoundry,
-  rightBoundry = boundaries.rightBoundry,
+  leftBoundary = boundaries.leftBoundary,
+  rightBoundary = boundaries.rightBoundary,
   gotPastScreenCallback,
   destroyedCallback
 }: {
   top?: number,
   bottom?: number,
-  leftBoundry?: number,
-  rightBoundry?: number,
+  leftBoundary?: number,
+  rightBoundary?: number,
   gotPastScreenCallback?: (thisEnemy: Enemy) => void,
   destroyedCallback?: (thisEnemy: Enemy) => void
 } = {}) {
@@ -162,7 +160,7 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
     return update(
       enemy,
       {
-        x: random(leftBoundry, rightBoundry, true),
+        x: random(leftBoundary, rightBoundary, true),
         y: top,
         isActive: true,
         emittedAt: Date.now()
@@ -231,7 +229,7 @@ export function rebuildEnemy (enemy: Enemy): Enemy {
       initialEnergy: energy
     })
   });
-};
+}
 
 export function getDefaultEnemy (id: number): Enemy {
   const DEFAULT_ENERGY = 1;
@@ -358,7 +356,6 @@ function _calculateScore (
 ) {
   const velocityScore = velocity || 1;
   const sideForceScore = sideForce || 1;
-  const score = Math.ceil(level + velocityScore * 10 + sideForceScore * 10 + initialEnergy);
 
-  return score;
+  return Math.ceil(level + velocityScore * 10 + sideForceScore * 10 + initialEnergy);
 }

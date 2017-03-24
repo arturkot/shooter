@@ -82,9 +82,18 @@
     .game-over.is-show {
       opacity: 1;
     }
+
+    .rewind {
+      position: absolute;
+      z-index: 1;
+      top: 70px;
+      left: var(--boundary-width);
+      right: var(--boundary-width);
+    }
   </style>
 </head>
 <body>
+  <input class="rewind js-rewind" type="range" value="1" min="1" max="100">
   <div class="score">
     <div>Score: <span class="score__points js-score">0000</span></div>
     <div>Hi-score: <span class="score__points js-hi-score">0000</span></div>
