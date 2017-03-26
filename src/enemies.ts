@@ -157,15 +157,12 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
   }
 
   if (freeEnemyId === enemy.id) {
-    return update(
-      enemy,
-      {
-        x: random(leftBoundary, rightBoundary, true),
-        y: top,
-        isActive: true,
-        emittedAt: Date.now()
-      }
-    );
+    return update(enemy, {
+      x: random(leftBoundary, rightBoundary, true),
+      y: top,
+      isActive: true,
+      emittedAt: Date.now()
+    });
   }
 
   if (enemy.energy <= 0 && !enemy.isDestroyed && destroyedCallback) {

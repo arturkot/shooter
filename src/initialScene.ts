@@ -13,6 +13,7 @@ export default function (initialGameState: GameState, els: Els, xShip: THREE.Mes
   const enemies = initialGameState.enemies;
   const bullets = initialGameState.bullets;
   const score = initialGameState.score;
+  const lives= initialGameState.lives;
   let gameStatus = initialGameState.gameStatus;
 
   if (isShoot) {
@@ -22,6 +23,10 @@ export default function (initialGameState: GameState, els: Els, xShip: THREE.Mes
 
   if (gameOverEl) {
     gameOverEl.classList.remove('is-show');
+  }
+
+  if (els.livesEl) {
+    els.livesEl.textContent = String(initialGameState.lives);
   }
 
   updateScore(scoreEl, score);
@@ -35,6 +40,7 @@ export default function (initialGameState: GameState, els: Els, xShip: THREE.Mes
     gameStatus,
     score,
     bullets,
-    enemies
+    enemies,
+    lives
   };
 }

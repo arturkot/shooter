@@ -44,7 +44,7 @@ function handleKeydown (event: KeyboardEvent) {
       break;
     case SPACE:
       isShoot = true;
-      isRewind = false;
+      // isRewind = false;
   }
 }
 
@@ -53,7 +53,7 @@ function handleKeyup (event: KeyboardEvent) {
 
   switch (keyCode) {
     case Z_KEY:
-      isRewind = !isRewind;
+    //   isRewind = !isRewind;
     case ARROW_LEFT:
       isMoveLeft = false;
       break;

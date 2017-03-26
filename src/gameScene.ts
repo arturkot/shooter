@@ -23,6 +23,7 @@ export default function (
   const freeEnemyId = getFreeEnemyId(gameState.enemies);
   let gameStatus = gameState.gameStatus;
   let score = gameState.score;
+  let lives = gameState.lives;
 
   if (isRewind) {
     gameStatus = GameStatus.rewind;
@@ -34,9 +35,17 @@ export default function (
 
   detectBulletCollisionAgainstXShip(xShip, gameState.enemies, scene, {
     collisionCallback: enemy => {
-      gameStatus = GameStatus.gameOver;
+      lives = lives - 1;
+
+      if (lives < 0) {
+        gameStatus = GameStatus.gameOver;
+        resetUserEvents();
+      } else if (els.livesEl) {
+        els.livesEl.textContent = String(lives);
+        gameStatus = GameStatus.autoRewind;
+      }
+
       score += enemy.score;
-      resetUserEvents();
       enemiesHit.push(enemy.id);
       updateScore(scoreEl, score);
       updateHiScore(hiScoreEl, score);
@@ -63,8 +72,16 @@ export default function (
     }) )
     .map( enemy => updateEnemy(enemy, freeEnemyId, {
       gotPastScreenCallback: () => {
-        gameStatus = GameStatus.gameOver;
-        resetUserEvents();
+        lives = lives - 1;
+
+        if (lives < 0) {
+          resetUserEvents();
+          gameStatus = GameStatus.gameOver;
+        } else if (els.livesEl) {
+          els.livesEl.textContent = String(lives);
+          gameStatus = GameStatus.autoRewind;
+        }
+
         updateHiScore(hiScoreEl, score);
         wooshSound.seek(0).play();
       },
@@ -83,6 +100,7 @@ export default function (
     gameStatus,
     score,
     bullets,
-    enemies
+    enemies,
+    lives
   };
 }

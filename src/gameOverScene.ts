@@ -8,6 +8,7 @@ import {
 import {
   getFreeEnemyId, updateEnemy, updateEnemyInScene
 } from "./enemies";
+import {LIVES} from './settings';
 
 export default function (gameState: GameState, els: Els, xShip: THREE.Mesh): GameState {
   const { gameOverEl } = els;
@@ -37,6 +38,7 @@ export default function (gameState: GameState, els: Els, xShip: THREE.Mesh): Gam
     score: gameState.score,
     enemies,
     bullets,
-    gameStatus
+    gameStatus,
+    lives: LIVES
   };
 }

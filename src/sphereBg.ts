@@ -1,8 +1,17 @@
 import { deg } from "./utils";
 
-export function animateSphereBg (sphereBg: THREE.Mesh) {
-  sphereBg.rotation.x  += -0.01;
-  sphereBg.rotation.z  += -0.001;
+type Direction = 'back' | 'forward';
+
+export function animateSphereBg (sphereBg: THREE.Mesh, direction: Direction = 'forward') {
+  switch (direction) {
+    case 'forward':
+      sphereBg.rotation.x += -0.01;
+      sphereBg.rotation.z += -0.001;
+      break;
+    case 'back':
+      sphereBg.rotation.x += +0.01;
+      sphereBg.rotation.z += +0.001;
+  }
 }
 
 export function addSphereBg (geometry: THREE.Geometry, scene: THREE.Scene) {
