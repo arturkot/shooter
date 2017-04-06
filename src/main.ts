@@ -9,25 +9,27 @@ import { updateHiScore } from "./score";
 import initialScene from './initialScene';
 import gameOverScene from './gameOverScene';
 import gameScene from './gameScene';
-import {isMoveLeft, isMoveRight, isRewind} from './userEvents';
+import {isMoveLeft, isMoveRight } from './userEvents';
 import {LIVES} from './settings';
 import {update} from 'immupdate';
+import {clockGet, clockReset, clockUpdate} from './clock';
 
 export interface Els {
   scoreEl: Element | null;
   hiScoreEl: Element | null;
   gameOverEl: Element | null;
-  rewindEl: HTMLInputElement | null;
   livesEl: Element | null;
+  flashEl: Element | null;
 }
 
-export enum GameStatus { initial, game, gameOver, rewind, autoRewind }
+export enum GameStatus { initial, game, gameOver, autoRewind }
 
 export interface GameState {
   readonly enemies: Enemy[];
   readonly bullets: Bullet[];
   readonly score: number;
   readonly gameStatus: GameStatus;
+  readonly prevGameStatus?: GameStatus;
   readonly lives: number;
 }
 
@@ -59,8 +61,8 @@ parsedResults.then(assets => {
     scoreEl: document.querySelector('.js-score'),
     hiScoreEl: document.querySelector('.js-hi-score'),
     gameOverEl: document.querySelector('.js-game-over'),
-    rewindEl: document.querySelector('.js-rewind') as HTMLInputElement,
-    livesEl: document.querySelector('.js-lives')
+    livesEl: document.querySelector('.js-lives'),
+    flashEl: document.querySelector('.js-flash')
   };
 
   const {
@@ -91,7 +93,7 @@ parsedResults.then(assets => {
 
   function render(gameState: GameState) {
     let newGameState: GameState = gameState;
-
+    clockUpdate();
     renderer.render(scene, camera);
 
     switch (gameState.gameStatus) {
@@ -103,55 +105,63 @@ parsedResults.then(assets => {
         prevStates = [];
         newGameState = gameOverScene(gameState, els, xShip);
         break;
-      case GameStatus.rewind:
-        if (!isRewind) {
-          newGameState = update(gameState, {
-            gameStatus: GameStatus.game
-          });
-        } else {
-          let rangeValue = 0;
-          if (els.rewindEl) {
-            rangeValue = parseInt(els.rewindEl.value, 10);
-          }
-          const calculatedStateIndex = Math.floor(prevStates.length * rangeValue / 100) - 1;
-          const prevStateIndex = calculatedStateIndex >= 0 ? calculatedStateIndex : 0;
-          const prevState = prevStates[prevStateIndex];
-
-          moveXShip(xShip, isMoveLeft, isMoveRight);
-          prevState.enemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
-
-          newGameState = update(prevStates[prevStateIndex], {
-            gameStatus: GameStatus.rewind
-          });
-        }
-        break;
       case GameStatus.autoRewind:
-        const prevState = prevStates.shift();
-
-        if (prevState) {
-          prevState.enemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
-          prevState.bullets.forEach( bullet => updateBulletInScene(bullet, scene) );
-
-          newGameState = update(prevState, {
-            lives: gameState.lives,
-            gameStatus: GameStatus.autoRewind
-          });
-        } else {
-          newGameState = update(gameState, {
-            lives: gameState.lives,
-            gameStatus: GameStatus.game
-          });
+        if (gameState.prevGameStatus !== gameState.gameStatus) {
+          clockReset();
+          if (els.flashEl) {
+            els.flashEl.classList.add('is-active');
+          }
         }
 
-        animateSphereBg(sphereBg, 'back');
-        moveXShip(xShip, isMoveLeft, isMoveRight);
+        if (clockGet() > 0.5) {
+          const prevState = prevStates.shift();
+
+          if (prevState) {
+            if (els.flashEl) {
+              els.flashEl.classList.remove('is-active');
+            }
+
+            prevState.enemies.forEach(enemy => updateEnemyInScene(enemy, scene));
+            prevState.bullets.forEach(bullet => updateBulletInScene(bullet, scene));
+
+            newGameState = update(prevState, {
+              lives: gameState.lives,
+              gameStatus: GameStatus.autoRewind
+            });
+
+            animateSphereBg(sphereBg, 'back');
+            moveXShip(xShip, isMoveLeft, isMoveRight);
+          } else {
+            newGameState = update(gameState, {
+              lives: gameState.lives,
+              gameStatus: GameStatus.game
+            });
+          }
+        }
 
         break;
       case GameStatus.game:
-        newGameState = gameScene(gameState, els, xShip, sphereBg);
-        prevStates = updatePrevStates(newGameState, prevStates);
+        if (gameState.prevGameStatus === GameStatus.autoRewind) {
+          clockReset();
+          if (els.flashEl) {
+            els.flashEl.classList.add('is-active');
+          }
+        }
+
+        if (clockGet() > 0.5) {
+          if (els.flashEl) {
+            els.flashEl.classList.remove('is-active');
+          }
+
+          newGameState = gameScene(gameState, els, xShip, sphereBg);
+          prevStates = updatePrevStates(newGameState, prevStates);
+        }
     }
 
-    requestAnimationFrame( () => render(newGameState) );
+    requestAnimationFrame( () => render(
+      update(newGameState, {
+        prevGameStatus: gameState.gameStatus
+      }))
+    );
   }
 });

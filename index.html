@@ -11,6 +11,20 @@
       --boundary-width: calc(50% - ( 100vh * (9 / 16) ) / 2);
     }
 
+    @keyframes flash {
+      0% {
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 1;
+      }
+
+      100% {
+        opacity: 0;
+      }
+    }
+
     * {
       box-sizing: border-box;
       user-select: none;
@@ -83,17 +97,24 @@
       opacity: 1;
     }
 
-    .rewind {
+    .flash {
       position: absolute;
-      z-index: 1;
-      top: 70px;
-      left: var(--boundary-width);
+      top: 0;
       right: var(--boundary-width);
+      bottom: 0;
+      left: var(--boundary-width);
+      display: none;
+      background: rgba(255, 255, 255, 0.5);
+    }
+
+    .flash.is-active {
+      display: block;
+      animation: flash 0.4s infinite linear;
     }
   </style>
 </head>
 <body>
-  <input class="rewind js-rewind" type="range" value="1" min="1" max="100">
+  <div class="flash js-flash"></div>
   <div class="score">
     <div>Score: <span class="score__points js-score">0000</span></div>
     <div>Lives: <span class="score__points js-lives">0</span></div>

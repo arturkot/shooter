@@ -1,6 +1,6 @@
 import { scene } from "./setup";
 import { GameState, GameStatus, Els } from './main';
-import {isMoveLeft, isMoveRight, isRewind, isShoot, resetUserEvents} from "./userEvents";
+import {isMoveLeft, isMoveRight, isShoot, resetUserEvents} from "./userEvents";
 import { moveXShip, detectBulletCollisionAgainstXShip } from "./xShip";
 import {
   getFreeBulletId, updateBullet, detectBulletCollisionAgainstEnemies,
@@ -24,14 +24,6 @@ export default function (
   let gameStatus = gameState.gameStatus;
   let score = gameState.score;
   let lives = gameState.lives;
-
-  if (isRewind) {
-    gameStatus = GameStatus.rewind;
-
-    if (els.rewindEl) {
-      els.rewindEl.value = '0';
-    }
-  }
 
   detectBulletCollisionAgainstXShip(xShip, gameState.enemies, scene, {
     collisionCallback: enemy => {
