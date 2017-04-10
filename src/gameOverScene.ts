@@ -31,8 +31,8 @@ export default function (gameState: GameState, els: Els, xShip: THREE.Mesh): Gam
 
   destroyXShip(xShip);
 
-  enemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
-  bullets.forEach( bullet => updateBulletInScene(bullet, scene) );
+  enemies.forEach( enemy => updateEnemyInScene(enemy) );
+  bullets.forEach( bullet => updateBulletInScene(bullet) );
 
   return {
     score: gameState.score,

@@ -129,8 +129,8 @@ parsedResults.then(assets => {
               els.flashEl.classList.remove('is-active');
             }
 
-            prevState.enemies.forEach(enemy => updateEnemyInScene(enemy, scene));
-            prevState.bullets.forEach(bullet => updateBulletInScene(bullet, scene));
+            prevState.enemies.forEach(enemy => updateEnemyInScene(enemy));
+            prevState.bullets.forEach(bullet => updateBulletInScene(bullet));
 
             newGameState = update(prevState, {
               lives: gameState.lives,
@@ -177,3 +177,5 @@ parsedResults.then(assets => {
     );
   }
 });
+
+console.log(scene);

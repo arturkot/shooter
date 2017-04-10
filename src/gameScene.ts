@@ -46,11 +46,11 @@ export default function (
 
   const bullets = gameState.bullets
     .map( bullet => updateBullet(bullet, freeBulletId, xShip.position.x, {
-      bulletEmittedCallback: () => {
+      bulletEmittedCallback () {
         blasterSound.seek(0).play();
       }
     }) )
-    .map( bullet => detectBulletCollisionAgainstEnemies(bullet, gameState.enemies, scene, {
+    .map( bullet => detectBulletCollisionAgainstEnemies(bullet, gameState.enemies, {
       collisionCallback: enemy => {
         score += enemy.score;
         enemiesHit.push(enemy.id);
@@ -82,8 +82,8 @@ export default function (
       }
     }) );
 
-  bullets.forEach( bullet => updateBulletInScene(bullet, scene) );
-  enemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
+  bullets.forEach( bullet => updateBulletInScene(bullet) );
+  enemies.forEach( enemy => updateEnemyInScene(enemy) );
 
   moveXShip(xShip, isMoveLeft, isMoveRight, {
     mouseX

@@ -1,4 +1,4 @@
-import { Enemy } from "./enemies";
+import {Enemy, enemyElements} from "./enemies";
 import { random } from "lodash";
 import { deg } from "./utils";
 import { rectIntersect } from "./collisionDetection";
@@ -158,7 +158,12 @@ export function detectBulletCollisionAgainstXShip (xShip: THREE.Mesh, enemies: E
   collisionCallback?: (enemy: Enemy) => void
 } = {}) {
   enemies.filter(enemy => enemy.isActive).forEach(enemy => {
-    const enemyElement = scene.getObjectById(enemy.id);
+    const enemyElement = enemyElements.find( element => element.id === enemy.id);
+
+    if (!enemyElement) {
+      return;
+    }
+
     const enemyBox = new THREE.Box3().setFromObject(enemyElement);
     const collision = xShip.getObjectByName('collision');
     const xShipBox = new THREE.Box3().setFromObject(collision);

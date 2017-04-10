@@ -46,21 +46,17 @@ function handleMouseMove (event: MouseEvent) {
 }
 
 function handleTouchMove (event: TouchEvent) {
-  event.preventDefault();
-
   const touch = event.touches[0];
   const x = touch.clientX;
 
   updateMouseX(x);
 }
 
-function handleTouchStart (event: TouchEvent) {
-  event.preventDefault();
+function handleTouchStart () {
   isShoot = true;
 }
 
-function handleTouchEnd (event: TouchEvent) {
-  event.preventDefault();
+function handleTouchEnd () {
   isShoot = false;
 }
 

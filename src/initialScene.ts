@@ -30,11 +30,11 @@ export default function (initialGameState: GameState, els: Els, xShip: THREE.Mes
   }
 
   updateScore(scoreEl, score);
-  resetEnemiesAppearanceInScene(enemies, scene);
+  resetEnemiesAppearanceInScene(enemies);
   resetXShip(xShip, settings.XSHIP_Y);
 
-  enemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
-  bullets.forEach( bullet => updateBulletInScene(bullet, scene) );
+  enemies.forEach( enemy => updateEnemyInScene(enemy) );
+  bullets.forEach( bullet => updateBulletInScene(bullet) );
 
   return {
     gameStatus,

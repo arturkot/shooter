@@ -1,8 +1,8 @@
 import { update } from 'immupdate';
 import * as settings from './settings';
 import { range } from "lodash";
-import { Enemy } from "./enemies";
-import { rectIntersect } from "./collisionDetection";
+import {Enemy, enemyElements} from "./enemies";
+import {circlePointCollision, rectIntersect} from "./collisionDetection";
 
 export interface Bullet {
   readonly id: number;
@@ -12,6 +12,8 @@ export interface Bullet {
   readonly isActive: boolean;
   readonly emittedAt?: number;
 };
+
+export const bulletElements: THREE.Mesh[] = [];
 
 export function generateBullets (maxNr: number, scene: THREE.Scene) {
   const OFFSCREEN = 9999;
@@ -23,6 +25,7 @@ export function generateBullets (maxNr: number, scene: THREE.Scene) {
 
     element.position.y = OFFSCREEN;
     scene.add(element);
+    bulletElements.push(element);
 
     const bullet: Bullet = {
       id: element.id,
@@ -106,16 +109,28 @@ export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
   return update(bullet, updatedBullet);
 }
 
-export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: Enemy[], scene: THREE.Scene, {
+export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: Enemy[], {
   collisionCallback
 }: {
   collisionCallback?: (enemy: Enemy) => void
 } = {}) {
   let { isActive } = bullet;
+  enemies.filter(enemy => {
+    const enemyRange = {
+      x: enemy.x,
+      y: enemy.y,
+      radius: 1
+    };
 
-  enemies.filter(enemy => enemy.isActive).forEach(enemy => {
-    const enemyElement = scene.getObjectById(enemy.id);
-    const bulletElement = scene.getObjectById(bullet.id);
+    return enemy.isActive && circlePointCollision(bullet.x, bullet.y, enemyRange);
+  }).forEach(enemy => {
+    const enemyElement = enemyElements.find(element => element.id === enemy.id);
+    const bulletElement = bulletElements.find(element => element.id === bullet.id);
+
+    if (!enemyElement || !bulletElement) {
+      return;
+    }
+
     const enemyBox = new THREE.Box3().setFromObject(enemyElement);
     const bulletBox = new THREE.Box3().setFromObject(bulletElement);
 
@@ -131,9 +146,13 @@ export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: En
   return update(bullet, { isActive });
 }
 
-export function updateBulletInScene (bullet: Bullet, scene: THREE.Scene) {
+export function updateBulletInScene (bullet: Bullet) {
   const OFFSCREEN = 9999;
-  const element = scene.getObjectById(bullet.id);
+  const element = bulletElements.find(element => element.id === bullet.id);
+
+  if (!element) {
+    return;
+  }
 
   if (bullet.isActive) {
     element.position.x = bullet.x;

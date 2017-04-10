@@ -29,6 +29,8 @@ export interface Enemy {
   readonly score: number;
 }
 
+export const enemyElements: THREE.Mesh[] = [];
+
 export function generateEnemies (maxNr: number, xTriangle: THREE.Geometry, scene: THREE.Scene) {
   const array = range(maxNr);
 
@@ -65,6 +67,7 @@ export function generateEnemies (maxNr: number, xTriangle: THREE.Geometry, scene
 
     element.position.y = OFFSCREEN;
     scene.add(element);
+    enemyElements.push(element);
     element.add(triangleA);
     element.add(triangleB);
 
@@ -181,7 +184,7 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
 
 export function handleEnemyCollision (
   enemy: Enemy, enemiesHit: number[],
-  hitCallback: (thisEnemy: Enemy) => void
+  hitCallback?: (thisEnemy: Enemy) => void
 ) {
   let { energy } = enemy;
 
@@ -258,9 +261,13 @@ export function getDefaultEnemy (id: number): Enemy {
   };
 }
 
-export function updateEnemyInScene (enemy: Enemy, scene: THREE.Scene) {
+export function updateEnemyInScene (enemy: Enemy) {
   const OFFSCREEN = 9999;
-  const element = scene.getObjectById(enemy.id) as THREE.Mesh;
+  const element = enemyElements.find(element => element.id === enemy.id);
+
+  if (!element) {
+    return;
+  }
 
   if (enemy.isDestroyed) {
     element.scale.x = random(0.9, 2, true);
@@ -283,9 +290,14 @@ export function updateEnemyInScene (enemy: Enemy, scene: THREE.Scene) {
   }
 }
 
-export function resetEnemiesAppearanceInScene (enemies: Enemy[], scene: THREE.Scene) {
+export function resetEnemiesAppearanceInScene (enemies: Enemy[]) {
   enemies.forEach( enemy => {
-    const element = scene.getObjectById(enemy.id) as THREE.Mesh;
+    const element = enemyElements.find( element => element.id === enemy.id);
+
+    if (!element) {
+      return;
+    }
+
     const material = element.material as THREE.MeshBasicMaterial;
     material.color.setHex(0x2C88D8);
   });
