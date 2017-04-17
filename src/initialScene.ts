@@ -1,5 +1,4 @@
 import * as settings from './settings';
-import { scene } from "./setup";
 import { isShoot, resetUserEvents } from "./userEvents";
 import { GameState, GameStatus, Els } from './main';
 import { updateScore } from "./score";

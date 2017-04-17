@@ -1,4 +1,3 @@
-import { scene } from "./setup";
 import { GameState, GameStatus, Els } from './main';
 import { isShoot, resetUserEvents } from './userEvents';
 import { destroyXShip } from "./xShip";

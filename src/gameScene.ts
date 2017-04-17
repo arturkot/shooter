@@ -1,4 +1,3 @@
-import { scene } from "./setup";
 import { GameState, GameStatus, Els } from './main';
 import {isMoveLeft, isMoveRight, mouseX, resetUserEvents} from "./userEvents";
 import { moveXShip, detectBulletCollisionAgainstXShip } from "./xShip";
@@ -25,7 +24,7 @@ export default function (
   let score = gameState.score;
   let lives = gameState.lives;
 
-  detectBulletCollisionAgainstXShip(xShip, gameState.enemies, scene, {
+  detectBulletCollisionAgainstXShip(xShip, gameState.enemies, {
     collisionCallback: enemy => {
       lives = lives - 1;
 

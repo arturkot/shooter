@@ -152,7 +152,7 @@ export function destroyXShip (xShip: THREE.Mesh) {
   }
 }
 
-export function detectBulletCollisionAgainstXShip (xShip: THREE.Mesh, enemies: Enemy[], scene: THREE.Scene, {
+export function detectBulletCollisionAgainstXShip (xShip: THREE.Mesh, enemies: Enemy[], {
   collisionCallback
 }: {
   collisionCallback?: (enemy: Enemy) => void
