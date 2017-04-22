@@ -1,9 +1,14 @@
-import {Enemy, enemyElements} from "./enemies";
-import { random } from "lodash";
-import { deg } from "./utils";
-import { rectIntersect } from "./collisionDetection";
-import * as boundaries from "./boundaries";
+import {Enemy, enemyElements} from './enemies';
+import {random} from 'lodash';
+import {deg} from './utils';
+import {rectIntersect} from './collisionDetection';
+import * as boundaries from './boundaries';
 import {gameWidth} from './boundaries';
+
+export let xShipCollisionElement: THREE.Mesh;
+export let exhaustAElement: THREE.Mesh;
+export let exhaustBElement: THREE.Mesh;
+export let exhaustCElement: THREE.Mesh;
 
 export function addXShip ({
     xShipCloud, xShipBody,
@@ -68,10 +73,18 @@ export function addXShip ({
   xShip.add(xLeft);
   xShip.add(body);
   xShip.add(rear);
+
   xShip.add(exhaustA);
+  exhaustAElement = exhaustA;
+
   xShip.add(exhaustB);
+  exhaustBElement = exhaustB;
+
   xShip.add(exhaustC);
+  exhaustCElement = exhaustC;
+
   xShip.add(collision);
+  xShipCollisionElement = collision;
 
   return xShip;
 }
@@ -87,10 +100,6 @@ export function moveXShip (xShip: THREE.Mesh, isMoveLeft = false, isMoveRight = 
 } = {}) {
   const MAX_ROTATION = 45;
   const ROTATION_SPEED = 1.4;
-
-  const exhaustA = xShip.getObjectByName('exhaustA');
-  const exhaustB = xShip.getObjectByName('exhaustB');
-  const exhaustC = xShip.getObjectByName('exhaustC');
 
   if (mouseX) {
     xShip.position.x = gameWidth * mouseX - gameWidth / 2;
@@ -118,12 +127,12 @@ export function moveXShip (xShip: THREE.Mesh, isMoveLeft = false, isMoveRight = 
     }
   }
 
-  exhaustA.scale.x = random(0.8, 1.1, true);
-  exhaustA.scale.y = random(0.8, 1.1, true);
-  exhaustB.scale.x = random(0.8, 1.1, true);
-  exhaustB.scale.y = random(0.8, 1.1, true);
-  exhaustC.scale.x = random(0.8, 1.1, true);
-  exhaustC.scale.y = random(0.8, 1.1, true);
+  exhaustAElement.scale.x = random(0.8, 1.1, true);
+  exhaustAElement.scale.y = random(0.8, 1.1, true);
+  exhaustBElement.scale.x = random(0.8, 1.1, true);
+  exhaustBElement.scale.y = random(0.8, 1.1, true);
+  exhaustCElement.scale.x = random(0.8, 1.1, true);
+  exhaustCElement.scale.y = random(0.8, 1.1, true);
 }
 
 export function resetXShip (xShip: THREE.Mesh, y: number) {
@@ -152,7 +161,7 @@ export function destroyXShip (xShip: THREE.Mesh) {
   }
 }
 
-export function detectBulletCollisionAgainstXShip (xShip: THREE.Mesh, enemies: Enemy[], {
+export function detectEnemyCollisionAgainstXShip (xShip: THREE.Mesh, enemies: Enemy[], {
   collisionCallback
 }: {
   collisionCallback?: (enemy: Enemy) => void

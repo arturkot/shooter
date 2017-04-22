@@ -1,7 +1,7 @@
 import { Els } from './main';
 import { GameStateData, GameStatus } from './gameState';
 import {isMoveLeft, isMoveRight, mouseX, resetUserEvents} from "./userEvents";
-import { moveXShip, detectBulletCollisionAgainstXShip } from "./xShip";
+import { moveXShip, detectEnemyCollisionAgainstXShip } from "./xShip";
 import {
   getFreeBulletId, updateBullet, detectBulletCollisionAgainstEnemies,
   updateBulletInScene
@@ -44,7 +44,7 @@ export default function (
     let score = lastGameState.score;
     let lives = lastGameState.lives;
 
-    detectBulletCollisionAgainstXShip(xShip, lastGameState.enemies, {
+    detectEnemyCollisionAgainstXShip(xShip, lastGameState.enemies, {
       collisionCallback: enemy => {
         lives = lives - 1;
 
