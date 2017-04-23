@@ -1,20 +1,13 @@
-import { Els } from './main';
-import { GameStateData, GameStatus } from './gameState';
-import {isMoveLeft, isMoveRight, mouseX, resetUserEvents} from "./userEvents";
-import { moveXShip, detectEnemyCollisionAgainstXShip } from "./xShip";
-import {
-  getFreeBulletId, updateBullet, detectBulletCollisionAgainstEnemies,
-  updateBulletInScene
-} from "./bullets";
-import {
-  getFreeEnemyId, rebornEnemies, updateEnemy, updateEnemyInScene,
-  handleEnemyCollision
-} from "./enemies";
-import { animateSphereBg } from "./sphereBg";
-import { updateScore, updateHiScore } from "./score";
-import { blasterSound, hitSound, wooshSound, explosionSound } from "./sounds";
+import {Els} from './main';
+import {GameStateData, GameStatus} from './gameState';
+import {isMoveLeft, isMoveRight, mouseX, resetUserEvents} from './userEvents';
+import {detectEnemyCollisionAgainstXShip, moveXShip} from './xShip';
+import {detectBulletCollisionAgainstEnemies, getFreeBulletId, updateBullet, updateBulletInScene} from './bullets';
+import {getFreeEnemyId, handleEnemyCollision, rebornEnemies, updateEnemy, updateEnemyInScene} from './enemies';
+import {animateSphereBg} from './sphereBg';
+import {updateHiScore, updateScore} from './score';
+import {blasterSound, explosionSound, hitSound, wooshSound} from './sounds';
 import {clockGet, clockReset} from './clock';
-import {update} from 'immupdate';
 
 export default function (
   lastGameState: GameStateData, prevGameState: GameStateData, els: Els, xShip: THREE.Mesh, sphereBg: THREE.Mesh
@@ -26,7 +19,7 @@ export default function (
       els.flashEl.classList.add('is-active');
     }
 
-    return update(lastGameState, {
+    return Object.assign({}, lastGameState, {
       gameStatus: GameStatus.game
     });
   }

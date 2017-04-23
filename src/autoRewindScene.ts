@@ -6,7 +6,6 @@ import {updateBulletInScene} from './bullets';
 import {animateSphereBg} from './sphereBg';
 import {moveXShip} from './xShip';
 import {isMoveLeft, isMoveRight, mouseX} from './userEvents';
-import {update} from 'immupdate';
 
 export default function (
   prevGameStates: GameState,
@@ -23,7 +22,7 @@ export default function (
       els.flashEl.classList.add('is-active');
     }
 
-    return update(lastGameState, {
+    return Object.assign({}, lastGameState, {
       gameStatus: GameStatus.autoRewind
     });
   }
@@ -46,7 +45,7 @@ export default function (
 
       return false;
     } else {
-      return update(prevGameStates.get(), {
+      return Object.assign({}, prevGameStates.get(), {
         lives: lastGameState.lives,
         gameStatus: GameStatus.game
       });

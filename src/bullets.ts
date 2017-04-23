@@ -1,8 +1,7 @@
-import { update } from 'immupdate';
 import * as settings from './settings';
-import { range } from "lodash";
-import {Enemy, enemyElements} from "./enemies";
-import {circlePointCollision, rectIntersect} from "./collisionDetection";
+import {range} from 'lodash';
+import {Enemy, enemyElements} from './enemies';
+import {circlePointCollision, rectIntersect} from './collisionDetection';
 
 export interface Bullet {
   readonly id: number;
@@ -106,7 +105,7 @@ export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
     }
   }
 
-  return update(bullet, updatedBullet);
+  return Object.assign({}, bullet, updatedBullet);
 }
 
 export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: Enemy[], {
@@ -143,7 +142,7 @@ export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: En
     }
   });
 
-  return update(bullet, { isActive });
+  return Object.assign({}, bullet, { isActive });
 }
 
 export function updateBulletInScene (bullet: Bullet) {

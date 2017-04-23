@@ -166,7 +166,9 @@ export function detectEnemyCollisionAgainstXShip (xShip: THREE.Mesh, enemies: En
 }: {
   collisionCallback?: (enemy: Enemy) => void
 } = {}) {
-  enemies.filter(enemy => enemy.isActive).forEach(enemy => {
+  enemies.filter(enemy => {
+    return enemy.isActive && enemy.y < -6;
+  }).forEach(enemy => {
     const enemyElement = enemyElements.find( element => element.id === enemy.id);
 
     if (!enemyElement) {

@@ -1,8 +1,7 @@
 import * as settings from './settings';
-import { range, random } from "lodash";
-import { deg } from "./utils";
-import * as boundaries from "./boundaries";
-import { update } from 'immupdate';
+import {random, range} from 'lodash';
+import {deg} from './utils';
+import * as boundaries from './boundaries';
 
 const OFFSCREEN = 9999;
 const MIN_REBORN_TIME = 500;
@@ -104,7 +103,7 @@ export function getFreeEnemyId (enemies?: Enemy[]) {
 export function rebornEnemies (enemies: Enemy[]) {
     if (enemies.every( enemy => enemy.isUsed ) ) {
       return enemies
-        .map( enemy => update(enemy, { isUsed: false }) );
+        .map( enemy => Object.assign({}, enemy, { isUsed: false }) );
     }
 
     return enemies;
@@ -160,7 +159,7 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
   }
 
   if (freeEnemyId === enemy.id) {
-    return update(enemy, {
+    return Object.assign({}, enemy, {
       x: random(leftBoundary, rightBoundary, true),
       y: top,
       isActive: true,
@@ -172,7 +171,7 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
     destroyedCallback(enemy);
   }
 
-  return update(enemy, {
+  return Object.assign({}, enemy, {
     x: enemy.x + _getNewEnemySideforce(enemy),
     y: enemy.y - enemy.velocity,
     rotation: enemy.rotation + deg(_getNewEnemySideforce(enemy) * 10),
@@ -196,7 +195,7 @@ export function handleEnemyCollision (
     }
   }
 
-  return update(enemy, { energy });
+  return Object.assign({}, enemy, { energy });
 }
 
 export function rebuildEnemy (enemy: Enemy): Enemy {
@@ -209,7 +208,7 @@ export function rebuildEnemy (enemy: Enemy): Enemy {
   const level = enemy.level + 1;
   const defaultEnemy = getDefaultEnemy(enemy.id);
 
-  return update(defaultEnemy, {
+  return Object.assign({}, defaultEnemy, {
     x: OFFSCREEN,
     y: OFFSCREEN,
     opacity: 1,
