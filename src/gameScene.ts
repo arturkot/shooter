@@ -1,6 +1,6 @@
 import { scene } from "./setup";
 import { GameState, GameStatus, Els } from './main';
-import {isMoveLeft, isMoveRight, isShoot, resetUserEvents} from "./userEvents";
+import {isMoveLeft, isMoveRight, mouseX, resetUserEvents} from "./userEvents";
 import { moveXShip, detectBulletCollisionAgainstXShip } from "./xShip";
 import {
   getFreeBulletId, updateBullet, detectBulletCollisionAgainstEnemies,
@@ -19,7 +19,7 @@ export default function (
 ): GameState {
   const { scoreEl, hiScoreEl } = els;
   const enemiesHit: number[] = [];
-  const freeBulletId = getFreeBulletId(gameState.bullets, isShoot);
+  const freeBulletId = getFreeBulletId(gameState.bullets, true);
   const freeEnemyId = getFreeEnemyId(gameState.enemies);
   let gameStatus = gameState.gameStatus;
   let score = gameState.score;
@@ -84,7 +84,10 @@ export default function (
 
   bullets.forEach( bullet => updateBulletInScene(bullet, scene) );
   enemies.forEach( enemy => updateEnemyInScene(enemy, scene) );
-  moveXShip(xShip, isMoveLeft, isMoveRight);
+
+  moveXShip(xShip, isMoveLeft, isMoveRight, {
+    mouseX
+  });
 
   animateSphereBg(sphereBg);
 

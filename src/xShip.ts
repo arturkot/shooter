@@ -3,6 +3,7 @@ import { random } from "lodash";
 import { deg } from "./utils";
 import { rectIntersect } from "./collisionDetection";
 import * as boundaries from "./boundaries";
+import {gameWidth} from './boundaries';
 
 export function addXShip ({
     xShipCloud, xShipBody,
@@ -77,10 +78,12 @@ export function addXShip ({
 
 export function moveXShip (xShip: THREE.Mesh, isMoveLeft = false, isMoveRight = false, {
   leftBoundary = boundaries.leftBoundary,
-  rightBoundary = boundaries.rightBoundary
+  rightBoundary = boundaries.rightBoundary,
+  mouseX
 }: {
   leftBoundary?: number,
-  rightBoundary?: number
+  rightBoundary?: number,
+  mouseX?: number
 } = {}) {
   const MAX_ROTATION = 45;
   const ROTATION_SPEED = 1.4;
@@ -89,7 +92,9 @@ export function moveXShip (xShip: THREE.Mesh, isMoveLeft = false, isMoveRight = 
   const exhaustB = xShip.getObjectByName('exhaustB');
   const exhaustC = xShip.getObjectByName('exhaustC');
 
-  if (isMoveLeft) {
+  if (mouseX) {
+    xShip.position.x = gameWidth * mouseX - gameWidth / 2;
+  } else if (isMoveLeft) {
     xShip.position.x = xShip.position.x <= leftBoundary ?
       leftBoundary :
       xShip.position.x - 0.2;

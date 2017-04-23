@@ -9,7 +9,7 @@ import { updateHiScore } from "./score";
 import initialScene from './initialScene';
 import gameOverScene from './gameOverScene';
 import gameScene from './gameScene';
-import {isMoveLeft, isMoveRight } from './userEvents';
+import {isMoveLeft, isMoveRight, mouseX} from './userEvents';
 import {ENABLE_STATS, LIVES} from './settings';
 import {update} from 'immupdate';
 import {clockGet, clockReset, clockUpdate} from './clock';
@@ -138,7 +138,9 @@ parsedResults.then(assets => {
             });
 
             animateSphereBg(sphereBg, 'back');
-            moveXShip(xShip, isMoveLeft, isMoveRight);
+            moveXShip(xShip, isMoveLeft, isMoveRight, {
+              mouseX
+            });
           } else {
             newGameState = update(gameState, {
               lives: gameState.lives,

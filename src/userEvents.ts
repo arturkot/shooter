@@ -1,6 +1,7 @@
 export let isMoveLeft = false;
 export let isMoveRight = false;
 export let isShoot = false;
+export let mouseX = 0;
 
 const SPACE = 32;
 const ARROW_LEFT = 37;
@@ -11,12 +12,23 @@ addEvents();
 function addEvents () {
   window.addEventListener('keydown', handleKeydown, false);
   window.addEventListener('keyup', handleKeyup, false);
+
+  window.addEventListener('mousemove', handleMouseMove, false);
+  document.addEventListener('touchmove', handleTouchMove, false);
+  document.addEventListener('touchstart', handleTouchStart, false);
+  document.addEventListener('touchend', handleTouchEnd, false);
 }
 
 function removeEvents () {
-    window.removeEventListener('keydown', handleKeydown, false);
-    window.removeEventListener('keyup', handleKeyup, false);
+  window.removeEventListener('keydown', handleKeydown, false);
+  window.removeEventListener('keyup', handleKeyup, false);
+
+  window.removeEventListener('mousemove', handleMouseMove, false);
+  document.removeEventListener('touchmove', handleTouchMove, false);
+  document.removeEventListener('touchstart', handleTouchStart, false);
+  document.removeEventListener('touchend', handleTouchEnd, false);
 }
+
 
 export function resetUserEvents (time: number = 1000) {
   isMoveLeft = false;
@@ -27,6 +39,44 @@ export function resetUserEvents (time: number = 1000) {
     removeEvents();
     setTimeout(addEvents, time);
   }
+}
+
+function handleMouseMove (event: MouseEvent) {
+  updateMouseX(event.x);
+}
+
+function handleTouchMove (event: TouchEvent) {
+  event.preventDefault();
+
+  const touch = event.touches[0];
+  const x = touch.clientX;
+
+  updateMouseX(x);
+}
+
+function handleTouchStart (event: TouchEvent) {
+  event.preventDefault();
+  isShoot = true;
+}
+
+function handleTouchEnd (event: TouchEvent) {
+  event.preventDefault();
+  isShoot = false;
+}
+
+function updateMouseX (x: number) {
+  const boundryWidth = window.innerWidth / 2 - window.innerHeight * 9 / 16 / 2;
+  let xPos = 0;
+
+  if (x <= boundryWidth) {
+    xPos = boundryWidth;
+  } else if (x >= window.innerWidth - boundryWidth) {
+    xPos = window.innerWidth - boundryWidth;
+  } else {
+    xPos = x;
+  }
+
+  mouseX = (xPos - boundryWidth) / (window.innerWidth - boundryWidth * 2);
 }
 
 function handleKeydown (event: KeyboardEvent) {
