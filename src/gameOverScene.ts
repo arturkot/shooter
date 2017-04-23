@@ -1,4 +1,5 @@
-import { GameState, GameStatus, Els } from './main';
+import { Els } from './main';
+import { GameStateData, GameStatus } from './gameState';
 import { isShoot, resetUserEvents } from './userEvents';
 import { destroyXShip } from "./xShip";
 import {
@@ -9,7 +10,7 @@ import {
 } from "./enemies";
 import {LIVES} from './settings';
 
-export default function (gameState: GameState, els: Els, xShip: THREE.Mesh): GameState {
+export default function (gameState: GameStateData, els: Els, xShip: THREE.Mesh): GameStateData {
   const { gameOverEl } = els;
   const freeBulletId = getFreeBulletId(gameState.bullets, isShoot);
   const freeEnemyId = getFreeEnemyId(gameState.enemies);
