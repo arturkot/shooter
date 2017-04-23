@@ -10,7 +10,7 @@ import initialScene from './initialScene';
 import gameOverScene from './gameOverScene';
 import gameScene from './gameScene';
 import {isMoveLeft, isMoveRight } from './userEvents';
-import {LIVES} from './settings';
+import {ENABLE_STATS, LIVES} from './settings';
 import {update} from 'immupdate';
 import {clockGet, clockReset, clockUpdate} from './clock';
 
@@ -87,11 +87,19 @@ parsedResults.then(assets => {
     enemies,
     lives: LIVES
   };
+  const stats = new Stats();
+
+  if (ENABLE_STATS) {
+    stats.showPanel(0);
+    document.body.appendChild(stats.dom);
+  }
 
   updateHiScore(els.hiScoreEl, settings.DEFAULT_SCORE);
   render(initialGameState);
 
   function render(gameState: GameState) {
+    if (ENABLE_STATS) { stats.begin(); }
+
     let newGameState: GameState = gameState;
     clockUpdate();
     renderer.render(scene, camera);
@@ -157,6 +165,8 @@ parsedResults.then(assets => {
           prevStates = updatePrevStates(newGameState, prevStates);
         }
     }
+
+    if (ENABLE_STATS) { stats.end(); }
 
     requestAnimationFrame( () => render(
       update(newGameState, {

@@ -7,3 +7,4 @@ export const TOP = 8;
 export const BOTTOM = -8;
 export const MAX_BULLETS_ON_SCREEN = 10;
 export const LIVES = 3;
+export const ENABLE_STATS = true;
