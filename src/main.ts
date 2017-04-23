@@ -87,6 +87,8 @@ parsedResults.then(assets => {
   render();
 
   function render() {
+    requestAnimationFrame(render);
+
     if (ENABLE_STATS) { stats.begin(); }
 
     const prevGameState = gameState.get(1);
@@ -138,7 +140,5 @@ parsedResults.then(assets => {
     }
 
     if (ENABLE_STATS) { stats.end(); }
-
-    requestAnimationFrame(render);
   }
 });
