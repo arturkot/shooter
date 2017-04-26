@@ -1,11 +1,12 @@
-import {GameState, GameStateData, GameStatus} from '../src/gameState';
+import {GameState, GameStatus} from '../src/gameState';
 import {DEFAULT_SCORE, LIVES} from '../src/settings';
+import {GameStateData} from '../src/main';
 
 const initialGameState: GameStateData = {
   gameStatus: GameStatus.initial,
   score: DEFAULT_SCORE,
   lives: LIVES
-} as GameStateData;
+};
 
 describe(`gameState`, () => {
   it(`should get default state`, () => {

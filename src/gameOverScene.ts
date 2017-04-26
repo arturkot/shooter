@@ -1,22 +1,30 @@
-import { Els } from './main';
-import { GameStateData, GameStatus } from './gameState';
+import {Els, GameStateData} from './main';
+import { GameStatus } from './gameState';
 import { isShoot, resetUserEvents } from './userEvents';
 import { destroyXShip } from "./xShip";
 import {
+  Bullet,
   getFreeBulletId, updateBullet, updateBulletInScene
 } from "./bullets";
 import {
+  Enemy,
   getFreeEnemyId, updateEnemy, updateEnemyInScene
 } from "./enemies";
 import {LIVES} from './settings';
 
-export default function (gameState: GameStateData, els: Els, xShip: THREE.Mesh): GameStateData {
+export default function (
+  gameState: GameStateData,
+  bullets: Bullet[],
+  enemies: Enemy[],
+  els: Els,
+  xShip: THREE.Mesh
+) {
   const { gameOverEl } = els;
-  const freeBulletId = getFreeBulletId(gameState.bullets, isShoot);
-  const freeEnemyId = getFreeEnemyId(gameState.enemies);
-  const bullets = gameState.bullets
+  const freeBulletId = getFreeBulletId(bullets, isShoot);
+  const freeEnemyId = getFreeEnemyId(enemies);
+  const newBullets = bullets
     .map( bullet => updateBullet(bullet, freeBulletId, xShip.position.x) );
-  const enemies = gameState.enemies
+  const newEnemies = enemies
     .map( enemy => updateEnemy(enemy, freeEnemyId) );
   let gameStatus = gameState.gameStatus;
 
@@ -31,14 +39,16 @@ export default function (gameState: GameStateData, els: Els, xShip: THREE.Mesh):
 
   destroyXShip(xShip);
 
-  enemies.forEach( enemy => updateEnemyInScene(enemy) );
-  bullets.forEach( bullet => updateBulletInScene(bullet) );
+  newEnemies.forEach( enemy => updateEnemyInScene(enemy) );
+  newBullets.forEach( bullet => updateBulletInScene(bullet) );
 
   return {
-    score: gameState.score,
-    enemies,
-    bullets,
-    gameStatus,
-    lives: LIVES
+    gameStateData: {
+      score: gameState.score,
+      gameStatus,
+      lives: LIVES
+    },
+    bullets: newBullets,
+    enemies: newEnemies
   };
 }

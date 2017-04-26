@@ -1,17 +1,30 @@
-import {Els} from './main';
-import {GameStateData, GameStatus} from './gameState';
+import {Els, GameStateData} from './main';
+import {GameStatus} from './gameState';
 import {isMoveLeft, isMoveRight, mouseX, resetUserEvents} from './userEvents';
 import {detectEnemyCollisionAgainstXShip, moveXShip} from './xShip';
-import {detectBulletCollisionAgainstEnemies, getFreeBulletId, updateBullet, updateBulletInScene} from './bullets';
-import {getFreeEnemyId, handleEnemyCollision, rebornEnemies, updateEnemy, updateEnemyInScene} from './enemies';
+import {
+  Bullet, detectBulletCollisionAgainstEnemies, getFreeBulletId, updateBullet,
+  updateBulletInScene
+} from './bullets';
+import {Enemy, getFreeEnemyId, handleEnemyCollision, rebornEnemies, updateEnemy, updateEnemyInScene} from './enemies';
 import {animateSphereBg} from './sphereBg';
 import {updateHiScore, updateScore} from './score';
 import {blasterSound, explosionSound, hitSound, wooshSound} from './sounds';
 import {clockGet, clockReset} from './clock';
 
 export default function (
-  lastGameState: GameStateData, prevGameState: GameStateData, els: Els, xShip: THREE.Mesh, sphereBg: THREE.Mesh
-): GameStateData | false {
+  lastBullets: Bullet[],
+  lastEnemies: Enemy[],
+  lastGameState: GameStateData,
+  prevGameState: GameStateData,
+  els: Els,
+  xShip: THREE.Mesh,
+  sphereBg: THREE.Mesh
+): {
+    gameStateData: GameStateData,
+    bullets: Bullet[],
+    enemies: Enemy[],
+} | {} {
   if (prevGameState.gameStatus === GameStatus.autoRewind) {
     clockReset();
 
@@ -19,9 +32,15 @@ export default function (
       els.flashEl.classList.add('is-active');
     }
 
-    return Object.assign({}, lastGameState, {
+    const newGameState = Object.assign({}, lastGameState, {
       gameStatus: GameStatus.game
     });
+
+    return {
+      gameStateData: newGameState,
+      enemies: lastEnemies,
+      bullets: lastBullets
+    };
   }
 
   if (clockGet() > 0.5) {
@@ -31,13 +50,13 @@ export default function (
 
     const {scoreEl, hiScoreEl} = els;
     const enemiesHit: number[] = [];
-    const freeBulletId = getFreeBulletId(lastGameState.bullets, true);
-    const freeEnemyId = getFreeEnemyId(lastGameState.enemies);
+    const freeBulletId = getFreeBulletId(lastBullets, true);
+    const freeEnemyId = getFreeEnemyId(lastEnemies);
     let gameStatus = lastGameState.gameStatus;
     let score = lastGameState.score;
     let lives = lastGameState.lives;
 
-    detectEnemyCollisionAgainstXShip(xShip, lastGameState.enemies, {
+    detectEnemyCollisionAgainstXShip(xShip, lastEnemies, {
       collisionCallback: enemy => {
         lives = lives - 1;
 
@@ -56,13 +75,13 @@ export default function (
       }
     });
 
-    const bullets = lastGameState.bullets
+    const bullets = lastBullets
       .map(bullet => updateBullet(bullet, freeBulletId, xShip.position.x, {
         bulletEmittedCallback () {
           blasterSound.seek(0).play();
         }
       }))
-      .map(bullet => detectBulletCollisionAgainstEnemies(bullet, lastGameState.enemies, {
+      .map(bullet => detectBulletCollisionAgainstEnemies(bullet, lastEnemies, {
         collisionCallback: enemy => {
           score += enemy.score;
           enemiesHit.push(enemy.id);
@@ -70,7 +89,7 @@ export default function (
         }
       }));
 
-    const enemies = rebornEnemies(lastGameState.enemies)
+    const enemies = rebornEnemies(lastEnemies)
       .map(enemy => handleEnemyCollision(enemy, enemiesHit, () => {
         hitSound.seek(0).play();
       }))
@@ -104,13 +123,10 @@ export default function (
     animateSphereBg(sphereBg);
 
     return {
-      gameStatus,
-      score,
-      bullets,
-      enemies,
-      lives
+      gameStateData: { gameStatus, lives, score },
+      bullets,  enemies
     };
   }
 
-  return false;
+  return {};
 }

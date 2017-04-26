@@ -1,7 +1,7 @@
 import {camera, renderer, scene} from './setup';
 import {addXShip} from './xShip';
-import {generateBullets} from './bullets';
-import {generateEnemies} from './enemies';
+import {Bullet, generateBullets} from './bullets';
+import {Enemy, generateEnemies} from './enemies';
 import {addSphereBg} from './sphereBg';
 import {parsedResults} from './getAssets';
 import {updateHiScore} from './score';
@@ -9,9 +9,9 @@ import initialScene from './initialScene';
 import gameOverScene from './gameOverScene';
 import autoRewindScene from './autoRewindScene';
 import gameScene from './gameScene';
-import {ENABLE_STATS, DEFAULT_SCORE, ENEMIES_WAVE, LIVES, MAX_BULLETS, XSHIP_Y} from './settings';
+import {DEFAULT_SCORE, ENABLE_STATS, ENEMIES_WAVE, LIVES, MAX_BULLETS, XSHIP_Y} from './settings';
 import {clockUpdate} from './clock';
-import {GameState, GameStateData, GameStatus} from './gameState';
+import {GameState, GameStatus} from './gameState';
 
 export interface Els {
   scoreEl: Element | null;
@@ -19,6 +19,12 @@ export interface Els {
   gameOverEl: Element | null;
   livesEl: Element | null;
   flashEl: Element | null;
+}
+
+export interface GameStateData {
+  readonly score: number;
+  readonly gameStatus: GameStatus;
+  readonly lives: number;
 }
 
 // let prevStates: GameStateData[] = [];
@@ -64,16 +70,18 @@ parsedResults.then(assets => {
     shipPositionY: XSHIP_Y
   });
 
-  const bullets = generateBullets(MAX_BULLETS, scene);
-  const enemies = generateEnemies(ENEMIES_WAVE, xTriangle, scene);
+  const initialBullets = generateBullets(MAX_BULLETS, scene);
+  const initialEnemies = generateEnemies(ENEMIES_WAVE, xTriangle, scene);
   const sphereBg = addSphereBg(sphereBgGeo, scene);
   const initialGameState: GameStateData = {
     gameStatus: GameStatus.initial,
     score: DEFAULT_SCORE,
-    bullets,
-    enemies,
     lives: LIVES
   };
+  const bulletsState = new GameState(1, initialBullets);
+  const prevBulletsStates = new GameState(100, initialBullets);
+  const enemiesState = new GameState(1, initialEnemies);
+  const prevEnemiesStates = new GameState(100, initialEnemies);
   const gameState = new GameState(2, initialGameState);
   const prevGameStates = new GameState(100, initialGameState);
   const stats = new Stats();
@@ -91,52 +99,105 @@ parsedResults.then(assets => {
 
     if (ENABLE_STATS) { stats.begin(); }
 
+    const lastBullets = bulletsState.get();
+    const lastEnemies = enemiesState.get();
     const prevGameState = gameState.get(1);
     const lastGameState = gameState.get();
-    let newGameState: GameStateData;
 
     clockUpdate();
     renderer.render(scene, camera);
 
     switch (lastGameState.gameStatus) {
-      case GameStatus.initial:
-        newGameState = initialScene(initialGameState, els, xShip);
+      case GameStatus.initial: {
+        const {
+          gameStateData,
+          bullets,
+          enemies
+        } = initialScene(initialGameState, initialBullets, initialEnemies, els, xShip);
+
+        bulletsState.reset();
+        bulletsState.add(bullets);
+
+        enemiesState.reset();
+        enemiesState.add(enemies);
+
         gameState.reset();
-        gameState.add(newGameState);
+        gameState.add(gameStateData);
+
         break;
-      case GameStatus.gameOver:
+      }
+      case GameStatus.gameOver: {
         gameState.reset();
-        newGameState = gameOverScene(lastGameState, els, xShip);
-        gameState.add(newGameState);
+        const {
+          gameStateData,
+          bullets,
+          enemies
+        } = gameOverScene(lastGameState, lastBullets, lastEnemies, els, xShip);
+        bulletsState.add(bullets);
+        enemiesState.add(enemies);
+        gameState.add(gameStateData);
         break;
-      case GameStatus.autoRewind:
-        newGameState = autoRewindScene(
-          prevGameStates,
+      }
+      case GameStatus.autoRewind: {
+        const {
+          gameStateData,
+          bullets,
+          enemies
+        } = autoRewindScene(
+            prevBulletsStates,
+            prevEnemiesStates,
+            prevGameStates,
+            lastGameState,
+            prevGameState,
+            els,
+            xShip,
+            sphereBg
+        ) as {
+          gameStateData: GameStateData,
+          bullets: Bullet[],
+          enemies: Enemy[],
+        };
+
+        if (gameStateData) {
+          gameState.add(gameStateData);
+        }
+
+        if (bullets && enemies) {
+          bulletsState.add(bullets);
+          enemiesState.add(enemies);
+        }
+
+        break;
+      } case GameStatus.game: {
+        const {
+          gameStateData,
+          enemies,
+          bullets
+        } = gameScene(
+          lastBullets,
+          lastEnemies,
           lastGameState,
           prevGameState,
           els,
           xShip,
           sphereBg
-        ) as GameStateData;
+        ) as {
+          gameStateData: GameStateData,
+          bullets: Bullet[],
+          enemies: Enemy[],
+        };
 
-        if (newGameState) {
-          gameState.add(newGameState);
+        if (gameStateData) {
+          bulletsState.add(bullets);
+          prevBulletsStates.add((bullets));
+
+          enemiesState.add(enemies);
+          prevEnemiesStates.add(enemies);
+
+          gameState.add(gameStateData);
+          prevGameStates.add(gameStateData);
         }
-
-        break;
-      case GameStatus.game:
-        newGameState = gameScene(
-          lastGameState,
-          prevGameState,
-          els,
-          xShip,
-          sphereBg
-        ) as GameStateData;
-
-        if (newGameState) {
-          gameState.add(newGameState);
-          prevGameStates.add(newGameState);
-        }
+      }
     }
 
     if (ENABLE_STATS) { stats.end(); }

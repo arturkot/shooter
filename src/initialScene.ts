@@ -1,17 +1,21 @@
 import * as settings from './settings';
 import { isShoot, resetUserEvents } from "./userEvents";
-import { Els } from './main';
-import { GameStateData, GameStatus } from './gameState';
+import {Els, GameStateData} from './main';
+import { GameStatus } from './gameState';
 import { updateScore } from "./score";
-import { resetEnemiesAppearanceInScene } from "./enemies";
+import {Enemy, resetEnemiesAppearanceInScene} from "./enemies";
 import { resetXShip } from "./xShip";
-import { updateBulletInScene } from "./bullets";
+import {Bullet, updateBulletInScene} from "./bullets";
 import { updateEnemyInScene } from "./enemies";
 
-export default function (initialGameState: GameStateData, els: Els, xShip: THREE.Mesh): GameStateData {
+export default function (
+  initialGameState: GameStateData,
+  bullets: Bullet[],
+  enemies: Enemy[],
+  els: Els,
+  xShip: THREE.Mesh
+) {
   const { gameOverEl, scoreEl } = els;
-  const enemies = initialGameState.enemies;
-  const bullets = initialGameState.bullets;
   const score = initialGameState.score;
   const lives= initialGameState.lives;
   let gameStatus = initialGameState.gameStatus;
@@ -37,10 +41,10 @@ export default function (initialGameState: GameStateData, els: Els, xShip: THREE
   bullets.forEach( bullet => updateBulletInScene(bullet) );
 
   return {
-    gameStatus,
-    score,
-    bullets,
-    enemies,
-    lives
-  };
+    gameStateData: {
+      gameStatus,
+      score,
+      lives
+    }, bullets, enemies
+ };
 }

@@ -1,20 +1,22 @@
 import {clockGet, clockReset} from './clock';
-import {GameState, GameStateData, GameStatus} from './gameState';
-import {Els} from './main';
-import {updateEnemyInScene} from './enemies';
-import {updateBulletInScene} from './bullets';
+import {GameState, GameStatus} from './gameState';
+import {Els, GameStateData} from './main';
+import {Enemy, updateEnemyInScene} from './enemies';
+import {Bullet, updateBulletInScene} from './bullets';
 import {animateSphereBg} from './sphereBg';
 import {moveXShip} from './xShip';
 import {isMoveLeft, isMoveRight, mouseX} from './userEvents';
 
 export default function (
-  prevGameStates: GameState,
+  prevBulletsStates: GameState<Bullet[]>,
+  prevEnemiesStates: GameState<Enemy[]>,
+  prevGameStates: GameState<GameStateData>,
   lastGameState: GameStateData,
   prevGameState: GameStateData,
   els: Els,
   xShip: THREE.Mesh,
   sphereBg: THREE.Mesh
-): GameStateData | false {
+) {
   if (prevGameState.gameStatus !== lastGameState.gameStatus) {
     clockReset();
 
@@ -22,35 +24,49 @@ export default function (
       els.flashEl.classList.add('is-active');
     }
 
-    return Object.assign({}, lastGameState, {
+    const newGameState = Object.assign({}, lastGameState, {
       gameStatus: GameStatus.autoRewind
     });
+
+    return {
+      gameStateData: newGameState
+    };
   }
 
   if (clockGet() > 0.5) {
+    const prevBullets = prevBulletsStates.use();
+    const prevEnemies = prevEnemiesStates.use();
     const prevState = prevGameStates.use();
+
+    if (prevBullets && prevEnemies) {
+      prevBullets.forEach(bullet => updateBulletInScene(bullet));
+      prevEnemies.forEach(enemy => updateEnemyInScene(enemy));
+    }
 
     if (prevState) {
       if (els.flashEl) {
         els.flashEl.classList.remove('is-active');
       }
 
-      prevState.enemies.forEach(enemy => updateEnemyInScene(enemy));
-      prevState.bullets.forEach(bullet => updateBulletInScene(bullet));
-
       animateSphereBg(sphereBg, 'back');
       moveXShip(xShip, isMoveLeft, isMoveRight, {
         mouseX
       });
 
-      return false;
+      return {};
     } else {
-      return Object.assign({}, prevGameStates.get(), {
+      const gameStateData = Object.assign({}, prevGameStates.get(), {
         lives: lastGameState.lives,
         gameStatus: GameStatus.game
       });
+
+      return {
+        gameStateData,
+        enemies: prevEnemiesStates.get(),
+        bullets: prevBulletsStates.get()
+      };
     }
   }
 
-  return false;
+  return {};
 }

@@ -1,35 +1,24 @@
-import {Enemy} from './enemies';
-import {Bullet} from './bullets';
-
 const LAST = -1;
 
 export enum GameStatus { initial, game, gameOver, autoRewind }
 
-export interface GameStateData {
-  readonly enemies: Enemy[];
-  readonly bullets: Bullet[];
-  readonly score: number;
-  readonly gameStatus: GameStatus;
-  readonly lives: number;
-}
-
-export interface GameStateValue {
+export interface GameStateValue<T> {
   order: number;
-  data: GameStateData;
+  data: T;
 }
 
-export class GameState {
+export class GameState<T> {
   private counter = 0;
-  values: GameStateValue[] = [];
+  values: GameStateValue<T>[] = [];
 
   constructor (
     private poolSize: number,
-    private initialGameState: GameStateData
+    private initialGameState: T
   ) {
     this.reset();
   }
 
-  add (value: GameStateData) {
+  add (value: T) {
     const newValue = {
       order: this.counter,
       data: value
@@ -70,7 +59,7 @@ export class GameState {
     return value.data;
   }
 
-  replaceLatest (value: GameStateData) {
+  replaceLatest (value: T) {
     this.values[0].data = value;
   }
 
