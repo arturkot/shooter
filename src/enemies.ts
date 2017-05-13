@@ -159,7 +159,7 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
   }
 
   if (freeEnemyId === enemy.id) {
-    return Object.assign({}, enemy, {
+    return Object.assign(enemy, {
       x: random(leftBoundary, rightBoundary, true),
       y: top,
       isActive: true,
@@ -171,7 +171,7 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
     destroyedCallback(enemy);
   }
 
-  return Object.assign({}, enemy, {
+  return Object.assign(enemy, {
     x: enemy.x + _getNewEnemySideforce(enemy),
     y: enemy.y - enemy.velocity,
     rotation: enemy.rotation + deg(_getNewEnemySideforce(enemy) * 10),
@@ -195,7 +195,7 @@ export function handleEnemyCollision (
     }
   }
 
-  return Object.assign({}, enemy, { energy });
+  return Object.assign(enemy, { energy });
 }
 
 export function rebuildEnemy (enemy: Enemy): Enemy {
@@ -208,7 +208,7 @@ export function rebuildEnemy (enemy: Enemy): Enemy {
   const level = enemy.level + 1;
   const defaultEnemy = getDefaultEnemy(enemy.id);
 
-  return Object.assign({}, defaultEnemy, {
+  return Object.assign(defaultEnemy, {
     x: OFFSCREEN,
     y: OFFSCREEN,
     opacity: 1,

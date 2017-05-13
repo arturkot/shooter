@@ -32,7 +32,7 @@ export default function (
       els.flashEl.classList.add('is-active');
     }
 
-    const newGameState = Object.assign({}, lastGameState, {
+    const newGameState = Object.assign(lastGameState, {
       gameStatus: GameStatus.game
     });
 

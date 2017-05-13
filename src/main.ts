@@ -99,10 +99,10 @@ parsedResults.then(assets => {
 
     if (ENABLE_STATS) { stats.begin(); }
 
-    const lastBullets = bulletsState.get();
-    const lastEnemies = enemiesState.get();
-    const prevGameState = gameState.get(1);
-    const lastGameState = gameState.get();
+    const lastBullets = bulletsState.get() as Bullet[];
+    const lastEnemies = enemiesState.get() as Enemy[];
+    const prevGameState = gameState.get(1) as GameStateData;
+    const lastGameState = gameState.get() as GameStateData;
 
     clockUpdate();
     renderer.render(scene, camera);

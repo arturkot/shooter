@@ -18,7 +18,7 @@ describe(`gameState`, () => {
     const gameState = new GameState(1, initialGameState);
 
     gameState.add({ score: 1 } as GameStateData);
-    expect(gameState.get()).toEqual({ score: 1});
+    expect(gameState.get()).toEqual({ ...initialGameState, score: 1});
   });
 
   it(`should return the latest entry`, () => {
@@ -28,7 +28,7 @@ describe(`gameState`, () => {
     gameState.add({ score: 55 } as GameStateData);
     gameState.add({ score: 12 } as GameStateData);
 
-    expect(gameState.get()).toEqual({ score: 12});
+    expect(gameState.get()).toEqual({ ...initialGameState, score: 12});
   });
 
   it(`should reset values`, () => {
@@ -53,7 +53,7 @@ describe(`gameState`, () => {
     gameState.add({ score: 4 } as GameStateData);
 
     expect(gameState.values.length).toBe(2);
-    expect(gameState.get()).toEqual({ score: 4});
+    expect(gameState.get()).toEqual({ ...initialGameState, score: 4});
   });
 
   it(`should mark used items`, () => {
@@ -65,12 +65,12 @@ describe(`gameState`, () => {
     gameState.add({ score: 4 } as GameStateData);
 
     expect(gameState.values.length).toBe(3);
-    expect(gameState.use()).toEqual({ score: 4});
-    expect(gameState.get()).toEqual({ score: 12});
+    expect(gameState.use()).toEqual({ ...initialGameState, score: 4});
+    expect(gameState.get()).toEqual({ ...initialGameState, score: 12});
 
     gameState.add({ score: 66 } as GameStateData);
 
-    expect(gameState.use()).toEqual({ score: 66});
+    expect(gameState.use()).toEqual({ ...initialGameState, score: 66});
   });
 
   it(`should mark selected used items`, () => {
@@ -82,12 +82,12 @@ describe(`gameState`, () => {
     gameState.add({ score: 4 } as GameStateData);
 
     expect(gameState.values.length).toBe(3);
-    expect(gameState.use(1)).toEqual({ score: 12});
-    expect(gameState.get()).toEqual({ score: 4});
+    expect(gameState.use(1)).toEqual({ ...initialGameState, score: 12});
+    expect(gameState.get()).toEqual({ ...initialGameState, score: 4});
 
     gameState.add({ score: 66 } as GameStateData);
 
-    expect(gameState.use(1)).toEqual({ score: 4});
+    expect(gameState.use(1)).toEqual({ ...initialGameState, score: 4});
   });
 
   it(`should return false in case useLatest all items have been used`, () => {
@@ -113,7 +113,7 @@ describe(`gameState`, () => {
     gameState.use();
     gameState.use();
 
-    expect(gameState.get()).toEqual({ score: 1 });
+    expect(gameState.get()).toEqual({ ...initialGameState, score: 1 });
   });
 
   it(`should return the value with given index`, () => {
@@ -127,7 +127,7 @@ describe(`gameState`, () => {
     gameState.use();
     gameState.use();
 
-    expect(gameState.get(2)).toEqual({ score: 11 });
+    expect(gameState.get(2)).toEqual({ ...initialGameState, score: 11 });
   });
 
   it(`should return the latest state in case requested index isn't available`, () => {
@@ -153,7 +153,7 @@ describe(`gameState`, () => {
     gameState.replaceLatest(newState);
 
     expect(gameState.get()).toEqual(newState);
-    expect(gameState.get(1)).toEqual({ score: 55 });
+    expect(gameState.get(1)).toEqual({ ...initialGameState, score: 55 });
   });
 
 });

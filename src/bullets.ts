@@ -105,7 +105,7 @@ export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
     }
   }
 
-  return Object.assign({}, bullet, updatedBullet);
+  return Object.assign(bullet, updatedBullet);
 }
 
 export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: Enemy[], {
@@ -142,7 +142,7 @@ export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: En
     }
   });
 
-  return Object.assign({}, bullet, { isActive });
+  return Object.assign(bullet, { isActive });
 }
 
 export function updateBulletInScene (bullet: Bullet) {

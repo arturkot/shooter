@@ -4,7 +4,7 @@ export enum GameStatus { initial, game, gameOver, autoRewind }
 
 export interface GameStateValue<T> {
   order: number;
-  data: T;
+  data: T | T[];
 }
 
 export class GameState<T> {
@@ -18,18 +18,30 @@ export class GameState<T> {
     this.reset();
   }
 
-  add (value: T) {
-    const newValue = {
-      order: this.counter,
-      data: value
-    };
-
+  add (newData: T) {
     this.counter += 1;
 
     if (this.poolSize === this.values.length) {
-      Object.assign(this.values[this.values.length - 1], newValue);
+      const prevValue = this.values[this.values.length - 1];
+      const { data } = prevValue;
+
+      if ( Array.isArray(newData) ) {
+        const dataArr = data as T[];
+        dataArr.forEach( (item, index) => {
+          Object.assign(item, newData[index]);
+        });
+      } else {
+        Object.assign(data, newData);
+      }
+      prevValue.order = this.counter;
+
       this.values.sort( (valA, valB) => valB.order - valA.order );
     } else {
+      const newValue = {
+        order: this.counter,
+        data: newData
+      };
+
       this.values.unshift(newValue);
     }
   }
@@ -59,18 +71,31 @@ export class GameState<T> {
     return value.data;
   }
 
-  replaceLatest (value: T) {
-    this.values[0].data = value;
+  replaceLatest (data: T) {
+    this.values[0].data = data;
   }
 
   reset () {
     this.counter = 0;
     this.values = [];
+
     for (let i = 0; i < this.poolSize; i += 1) {
       this.values.push({
         order: LAST,
-        data: this.initialGameState
+        data: this.createInitialData(this.initialGameState)
       });
     }
+  }
+
+  private createInitialData (data: T) {
+    if ( Array.isArray(data) ) {
+      const dataArr = data as T[];
+
+      return dataArr.map( (item, index) => {
+        return Object.assign({}, item, data[index]);
+      });
+    }
+
+    return Object.assign({}, data);
   }
 }

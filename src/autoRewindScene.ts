@@ -34,8 +34,8 @@ export default function (
   }
 
   if (clockGet() > 0.5) {
-    const prevBullets = prevBulletsStates.use();
-    const prevEnemies = prevEnemiesStates.use();
+    const prevBullets = prevBulletsStates.use() as Bullet[];
+    const prevEnemies = prevEnemiesStates.use() as Enemy[];
     const prevState = prevGameStates.use();
 
     if (prevBullets && prevEnemies) {
@@ -55,7 +55,7 @@ export default function (
 
       return {};
     } else {
-      const gameStateData = Object.assign({}, prevGameStates.get(), {
+      const gameStateData = Object.assign(prevGameStates.get(), {
         lives: lastGameState.lives,
         gameStatus: GameStatus.game
       });
