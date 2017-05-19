@@ -1,4 +1,4 @@
-import {camera, renderer, scene} from './setup';
+import {scene} from './setup';
 import {addXShip} from './xShip';
 import {Bullet, generateBullets} from './bullets';
 import {Enemy, generateEnemies} from './enemies';
@@ -9,9 +9,10 @@ import initialScene from './initialScene';
 import gameOverScene from './gameOverScene';
 import autoRewindScene from './autoRewindScene';
 import gameScene from './gameScene';
-import {DEFAULT_SCORE, ENABLE_STATS, ENEMIES_WAVE, LIVES, MAX_BULLETS, XSHIP_Y} from './settings';
+import {DEFAULT_SCORE, ENEMIES_WAVE, LIVES, MAX_BULLETS, XSHIP_Y} from './settings';
 import {clockUpdate} from './clock';
 import {GameState, GameStatus} from './gameState';
+import {gameLoop} from './gameLoop';
 
 export interface Els {
   scoreEl: Element | null;
@@ -84,28 +85,17 @@ parsedResults.then(assets => {
   const prevEnemiesStates = new GameState(100, initialEnemies);
   const gameState = new GameState(2, initialGameState);
   const prevGameStates = new GameState(100, initialGameState);
-  const stats = new Stats();
-
-  if (ENABLE_STATS) {
-    stats.showPanel(0);
-    document.body.appendChild(stats.dom);
-  }
 
   updateHiScore(els.hiScoreEl, DEFAULT_SCORE);
-  render();
+  gameLoop(render);
 
   function render() {
-    requestAnimationFrame(render);
-
-    if (ENABLE_STATS) { stats.begin(); }
-
     const lastBullets = bulletsState.get() as Bullet[];
     const lastEnemies = enemiesState.get() as Enemy[];
     const prevGameState = gameState.get(1) as GameStateData;
     const lastGameState = gameState.get() as GameStateData;
 
     clockUpdate();
-    renderer.render(scene, camera);
 
     switch (lastGameState.gameStatus) {
       case GameStatus.initial: {
@@ -199,7 +189,5 @@ parsedResults.then(assets => {
         }
       }
     }
-
-    if (ENABLE_STATS) { stats.end(); }
   }
 });
