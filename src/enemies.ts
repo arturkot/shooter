@@ -1,7 +1,8 @@
 import * as settings from './settings';
-import {random, range} from 'lodash';
+import {random, range, clamp} from 'lodash';
 import {deg} from './utils';
 import * as boundaries from './boundaries';
+import {timeUnit} from './gameLoop';
 
 const OFFSCREEN = 9999;
 const MIN_REBORN_TIME = 500;
@@ -118,7 +119,7 @@ function _getNewEnemyOpacity (enemy: Enemy) {
     const { opacity } = enemy;
 
     delete enemy.opacity;
-    return opacity - 0.1;
+    return opacity - 0.1 * timeUnit;
   }
 
   return enemy.opacity;
@@ -127,7 +128,7 @@ function _getNewEnemyOpacity (enemy: Enemy) {
 function _getNewEnemySideforce(enemy: Enemy): number {
   const {leftBoundary, rightBoundary} = boundaries;
 
-  if (enemy.x < leftBoundary || enemy.x > rightBoundary) {
+  if (enemy.x <= leftBoundary || enemy.x >= rightBoundary) {
     return enemy.sideForce * -1;
   }
 
@@ -172,9 +173,9 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
   }
 
   return Object.assign(enemy, {
-    x: enemy.x + _getNewEnemySideforce(enemy),
-    y: enemy.y - enemy.velocity,
-    rotation: enemy.rotation + deg(_getNewEnemySideforce(enemy) * 10),
+    x: clamp(enemy.x + _getNewEnemySideforce(enemy) * timeUnit, leftBoundary, rightBoundary),
+    y: enemy.y - enemy.velocity * timeUnit,
+    rotation: enemy.rotation + deg(_getNewEnemySideforce(enemy) * 10 * timeUnit),
     isDestroyed: enemy.energy <= 0,
     opacity: _getNewEnemyOpacity(enemy),
     sideForce: _getNewEnemySideforce(enemy)

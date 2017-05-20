@@ -1,16 +1,17 @@
 import { deg } from "./utils";
+import {timeUnit} from './gameLoop';
 
 type Direction = 'back' | 'forward';
 
 export function animateSphereBg (sphereBg: THREE.Mesh, direction: Direction = 'forward') {
   switch (direction) {
     case 'forward':
-      sphereBg.rotation.x += -0.01;
-      sphereBg.rotation.z += -0.001;
+      sphereBg.rotation.x += -0.01 * timeUnit;
+      sphereBg.rotation.z += -0.001 * timeUnit;
       break;
     case 'back':
-      sphereBg.rotation.x += +0.01;
-      sphereBg.rotation.z += +0.001;
+      sphereBg.rotation.x += +0.01 * timeUnit;
+      sphereBg.rotation.z += +0.001 * timeUnit;
   }
 }
 

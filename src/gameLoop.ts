@@ -1,30 +1,35 @@
 import {ENABLE_STATS} from './settings';
 import {camera, renderer, scene} from './setup';
-const fps = 60;
-const interval = 1000 / fps;
-let then = performance.now();
-const stats = new Stats();
-let now;
-let delta;
 
+const FPS = 60;
+const INTERVAL = 1000 / FPS;
+const stats = new Stats();
+
+let rafThen = Date.now();
+let then = Date.now();
+let now, delta, rafNow, rafDelta;
 
 if (ENABLE_STATS) {
   stats.showPanel(0);
   document.body.appendChild(stats.dom);
 }
 
+export let timeUnit = 1;
+
 export function gameLoop (callback: () => void) {
   requestAnimationFrame( () => gameLoop(callback) );
 
-  now = performance.now();
-  delta = now - then;
+  rafNow = Date.now();
+  rafDelta = rafNow - rafThen;
 
-  if (delta > interval) {
+  if (rafDelta > INTERVAL) {
     if (ENABLE_STATS) { stats.begin(); }
-    then = now - (delta % fps);
-    for (let i = 0; i < Math.ceil(interval / delta); i++) {
-      callback();
-    }
+    now = Date.now();
+    delta = now - then;
+    then = now;
+    timeUnit = Math.ceil(100 * delta / INTERVAL) / 100;
+    rafThen = rafNow - (rafDelta % FPS);
+    callback();
     renderer.render(scene, camera);
     if (ENABLE_STATS) { stats.end(); }
   }

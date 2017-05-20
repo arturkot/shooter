@@ -2,6 +2,7 @@ import * as settings from './settings';
 import {range} from 'lodash';
 import {Enemy, enemyElements} from './enemies';
 import {circlePointCollision, rectIntersect} from './collisionDetection';
+import {timeUnit} from './gameLoop';
 
 export interface Bullet {
   readonly id: number;
@@ -91,7 +92,7 @@ export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
   }
 
   if (bullet.isActive) {
-    updatedBullet.y += bulletSpeed;
+    updatedBullet.y += bulletSpeed * timeUnit;
   }
 
   if (bullet.id === freeBulletId) {
