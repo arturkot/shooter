@@ -23,9 +23,9 @@ export interface Els {
 }
 
 export interface GameStateData {
-  readonly score: number;
-  readonly gameStatus: GameStatus;
-  readonly lives: number;
+  score: number;
+  gameStatus: GameStatus;
+  lives: number;
 }
 
 // let prevStates: GameStateData[] = [];
@@ -159,11 +159,7 @@ parsedResults.then(assets => {
 
         break;
       } case GameStatus.game: {
-        const {
-          gameStateData,
-          enemies,
-          bullets
-        } = gameScene(
+        gameScene(
           lastBullets,
           lastEnemies,
           lastGameState,
@@ -171,21 +167,17 @@ parsedResults.then(assets => {
           els,
           xShip,
           sphereBg
-        ) as {
-          gameStateData: GameStateData,
-          bullets: Bullet[],
-          enemies: Enemy[],
-        };
+        );
 
-        if (gameStateData) {
-          bulletsState.add(bullets);
-          prevBulletsStates.add((bullets));
+        if (lastGameState) {
+          bulletsState.add(lastBullets);
+          prevBulletsStates.add(lastBullets);
 
-          enemiesState.add(enemies);
-          prevEnemiesStates.add(enemies);
+          enemiesState.add(lastEnemies);
+          prevEnemiesStates.add(lastEnemies);
 
-          gameState.add(gameStateData);
-          prevGameStates.add(gameStateData);
+          gameState.add(lastGameState);
+          prevGameStates.add(lastGameState);
         }
       }
     }

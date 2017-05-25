@@ -13,18 +13,14 @@ import {blasterSound, explosionSound, hitSound, wooshSound} from './sounds';
 import {clockGet, clockReset} from './clock';
 
 export default function (
-  lastBullets: Bullet[],
-  lastEnemies: Enemy[],
+  bullets: Bullet[],
+  enemies: Enemy[],
   lastGameState: GameStateData,
   prevGameState: GameStateData,
   els: Els,
   xShip: THREE.Mesh,
   sphereBg: THREE.Mesh
-): {
-    gameStateData: GameStateData,
-    bullets: Bullet[],
-    enemies: Enemy[],
-} | {} {
+) {
   if (prevGameState.gameStatus === GameStatus.autoRewind) {
     clockReset();
 
@@ -38,8 +34,8 @@ export default function (
 
     return {
       gameStateData: newGameState,
-      enemies: lastEnemies,
-      bullets: lastBullets
+      enemies: enemies,
+      bullets: bullets
     };
   }
 
@@ -50,68 +46,71 @@ export default function (
 
     const {scoreEl, hiScoreEl} = els;
     const enemiesHit: number[] = [];
-    const freeBulletId = getFreeBulletId(lastBullets, true);
-    const freeEnemyId = getFreeEnemyId(lastEnemies);
-    let gameStatus = lastGameState.gameStatus;
-    let score = lastGameState.score;
-    let lives = lastGameState.lives;
+    const freeBulletId = getFreeBulletId(bullets, true);
+    const freeEnemyId = getFreeEnemyId(enemies);
 
-    detectEnemyCollisionAgainstXShip(xShip, lastEnemies, {
+    detectEnemyCollisionAgainstXShip(xShip, enemies, {
       collisionCallback: enemy => {
-        lives = lives - 1;
+        lastGameState.lives = lastGameState.lives - 1;
 
-        if (lives < 0) {
-          gameStatus = GameStatus.gameOver;
+        if (lastGameState.lives < 0) {
+          lastGameState.gameStatus = GameStatus.gameOver;
           resetUserEvents();
         } else if (els.livesEl) {
-          els.livesEl.textContent = String(lives);
-          gameStatus = GameStatus.autoRewind;
+          els.livesEl.textContent = String(lastGameState.lives);
+          lastGameState.gameStatus = GameStatus.autoRewind;
         }
 
-        score += enemy.score;
+        lastGameState.score += enemy.score;
         enemiesHit.push(enemy.id);
-        updateScore(scoreEl, score);
-        updateHiScore(hiScoreEl, score);
+        updateScore(scoreEl, lastGameState.score);
+        updateHiScore(hiScoreEl, lastGameState.score);
       }
     });
 
-    const bullets = lastBullets
-      .map(bullet => updateBullet(bullet, freeBulletId, xShip.position.x, {
+    bullets.forEach( bullet => {
+      updateBullet(bullet, freeBulletId, xShip.position.x, {
         bulletEmittedCallback () {
           blasterSound.seek(0).play();
         }
-      }))
-      .map(bullet => detectBulletCollisionAgainstEnemies(bullet, lastEnemies, {
+      });
+
+      detectBulletCollisionAgainstEnemies(bullet, enemies, {
         collisionCallback: enemy => {
-          score += enemy.score;
+          lastGameState.score += enemy.score;
           enemiesHit.push(enemy.id);
-          updateScore(scoreEl, score);
+          updateScore(scoreEl, lastGameState.score);
         }
-      }));
+      });
+    });
 
-    const enemies = rebornEnemies(lastEnemies)
-      .map(enemy => handleEnemyCollision(enemy, enemiesHit, () => {
+    rebornEnemies(enemies);
+
+    enemies.forEach(enemy => {
+      handleEnemyCollision(enemy, enemiesHit, () => {
         hitSound.seek(0).play();
-      }))
-      .map(enemy => updateEnemy(enemy, freeEnemyId, {
-        gotPastScreenCallback: () => {
-          lives = lives - 1;
+      });
 
-          if (lives < 0) {
+      updateEnemy(enemy, freeEnemyId, {
+        gotPastScreenCallback: () => {
+          lastGameState.lives = lastGameState.lives - 1;
+
+          if (lastGameState.lives < 0) {
             resetUserEvents();
-            gameStatus = GameStatus.gameOver;
+            lastGameState.gameStatus = GameStatus.gameOver;
           } else if (els.livesEl) {
-            els.livesEl.textContent = String(lives);
-            gameStatus = GameStatus.autoRewind;
+            els.livesEl.textContent = String(lastGameState.lives);
+            lastGameState.gameStatus = GameStatus.autoRewind;
           }
 
-          updateHiScore(hiScoreEl, score);
+          updateHiScore(hiScoreEl, lastGameState.score);
           wooshSound.seek(0).play();
         },
         destroyedCallback: () => {
           explosionSound.seek(0).play();
         }
-      }));
+      });
+    });
 
     bullets.forEach(bullet => updateBulletInScene(bullet));
     enemies.forEach(enemy => updateEnemyInScene(enemy));
@@ -121,12 +120,5 @@ export default function (
     });
 
     animateSphereBg(sphereBg);
-
-    return {
-      gameStateData: { gameStatus, lives, score },
-      bullets,  enemies
-    };
   }
-
-  return {};
 }

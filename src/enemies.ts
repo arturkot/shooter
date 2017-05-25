@@ -102,12 +102,11 @@ export function getFreeEnemyId (enemies?: Enemy[]) {
 }
 
 export function rebornEnemies (enemies: Enemy[]) {
-    if (enemies.every( enemy => enemy.isUsed ) ) {
-      return enemies
-        .map( enemy => Object.assign({}, enemy, { isUsed: false }) );
+    if ( enemies.every( enemy => enemy.isUsed ) ) {
+      enemies.forEach( enemy => Object.assign(enemy, {
+        isUsed: false
+      }) );
     }
-
-    return enemies;
 }
 
 function _checkIfEnemyVanished (enemy: Enemy) {
@@ -209,7 +208,7 @@ export function rebuildEnemy (enemy: Enemy): Enemy {
   const level = enemy.level + 1;
   const defaultEnemy = getDefaultEnemy(enemy.id);
 
-  return Object.assign(defaultEnemy, {
+  return Object.assign(enemy, defaultEnemy, {
     x: OFFSCREEN,
     y: OFFSCREEN,
     opacity: 1,
