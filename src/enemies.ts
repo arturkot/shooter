@@ -110,7 +110,7 @@ export function rebornEnemies (enemies: Enemy[]) {
 }
 
 function _checkIfEnemyVanished (enemy: Enemy) {
-  return enemy.isDestroyed && enemy.opacity <=0;
+  return enemy.isDestroyed && enemy.opacity === 0;
 }
 
 function _getNewEnemyOpacity (enemy: Enemy) {
@@ -118,6 +118,11 @@ function _getNewEnemyOpacity (enemy: Enemy) {
     const { opacity } = enemy;
 
     delete enemy.opacity;
+
+    if (opacity <= 0) {
+      return 0;
+    }
+
     return opacity - 0.1 * timeUnit;
   }
 

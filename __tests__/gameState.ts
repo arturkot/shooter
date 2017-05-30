@@ -156,4 +156,89 @@ describe(`gameState`, () => {
     expect(gameState.get(1)).toEqual({ ...initialGameState, score: 55 });
   });
 
+  it(`should modify only selected item`, () => {
+    const gameState = new GameState(2, initialGameState);
+
+    const lastGameState = gameState.get() as GameStateData;
+    const prevGameState = gameState.get(1) as GameStateData;
+
+    lastGameState.gameStatus = GameStatus.gameOver;
+
+    expect(prevGameState.gameStatus).toBe(GameStatus.initial);
+  });
+
+
+  describe(`align`, () => {
+    it(`
+    should align same properties in all states to selected value
+    if at least one of the values matches the selected value
+    for array of values
+  `, () => {
+      interface Item {
+        a: number;
+        b: number;
+      }
+      const initialGameState: Item[] = [
+        {
+          a: 1,
+          b: 2
+        },
+        {
+          a: 33,
+          b: 44
+        },
+        {
+          a: 22,
+          b: 44
+        }
+      ];
+
+      const gameState = new GameState(44, initialGameState);
+      const itemA = gameState.get(22) as Item[];
+      const itemC = gameState.get(10) as Item[];
+
+      itemA[0].a = 0;
+      itemC[2].b = 11;
+
+      gameState.align('a', 0);
+      gameState.align('b', 11);
+
+      const itemsA = gameState.values.map( value => value.data[0] as Item );
+      const itemsB = gameState.values.map( value => value.data[1] as Item );
+      const itemsC = gameState.values.map( value => value.data[2] as Item );
+
+      expect( itemsA.every( item => item.a === 0) ).toBeTruthy();
+      expect( itemsB.every( item => item.a === 33 && item.b === 44) ).toBeTruthy();
+      expect( itemsC.every( item => item.b === 11) ).toBeTruthy();
+    });
+
+    it(`
+    should align same properties in all states to selected value
+    if at least one of the values matches the selected value
+    for objects
+  `, () => {
+      interface Item {
+        a: number;
+        b: number;
+      }
+      const initialGameState: Item = {
+        a: 1,
+        b: 2
+      };
+
+      const gameState = new GameState(34, initialGameState);
+      const itemA = gameState.get(22) as Item;
+
+      itemA.b = -33;
+
+      gameState.align('b', -33);
+
+      const expected = gameState.values.every( value => {
+        const data = value.data as Item;
+        return data.b === -33;
+      });
+
+      expect(expected).toBeTruthy();
+    });
+  });
 });

@@ -8,9 +8,13 @@ import {moveXShip} from './xShip';
 import {isMoveLeft, isMoveRight, mouseX} from './userEvents';
 
 export default function (
+  bulletsState: GameState<Bullet[]>,
   prevBulletsStates: GameState<Bullet[]>,
+  enemiesState: GameState<Enemy[]>,
   prevEnemiesStates: GameState<Enemy[]>,
+  gameStatesCache: GameState<GameStateData>,
   prevGameStates: GameState<GameStateData>,
+  gameState: GameState<GameStateData>,
   lastGameState: GameStateData,
   prevGameState: GameStateData,
   els: Els,
@@ -24,13 +28,13 @@ export default function (
       els.flashEl.classList.add('is-active');
     }
 
-    const newGameState = Object.assign({}, lastGameState, {
+    const gameStateData = Object.assign(lastGameState, {
       gameStatus: GameStatus.autoRewind
     });
 
-    return {
-      gameStateData: newGameState
-    };
+    gameStatesCache.add(gameStateData);
+    prevEnemiesStates.align('isDestroyed', true);
+    prevEnemiesStates.align('opacity', 0);
   }
 
   if (clockGet() > 0.5) {
@@ -52,21 +56,17 @@ export default function (
       moveXShip(xShip, isMoveLeft, isMoveRight, {
         mouseX
       });
-
-      return {};
     } else {
       const gameStateData = Object.assign(prevGameStates.get(), {
         lives: lastGameState.lives,
         gameStatus: GameStatus.game
-      });
+      }) as GameStateData;
 
-      return {
-        gameStateData,
-        enemies: prevEnemiesStates.get(),
-        bullets: prevBulletsStates.get()
-      };
+
+      gameState.add(gameStateData);
+      gameStatesCache.add(gameStateData);
+      bulletsState.add( prevBulletsStates.get() as Bullet[] );
+      enemiesState.add( prevEnemiesStates.get() as Enemy[] );
     }
   }
-
-  return {};
 }

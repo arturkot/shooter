@@ -87,6 +87,48 @@ export class GameState<T> {
     }
   }
 
+  align (keyName: string, alignValue: any) {
+    const { values } = this;
+    const isArrays = Array.isArray(values[0].data);
+
+    if (isArrays) {
+      const matchedItemIndexes = new Set();
+
+      values.forEach( value => {
+        const data = value.data as T[];
+
+        data.forEach( (item: { [key: string]: any}, index) => {
+          const itemValue = item[keyName];
+
+          if (itemValue === alignValue) {
+            matchedItemIndexes.add(index);
+          }
+        });
+      });
+
+      values.forEach( value => {
+        const data = value.data as T[];
+
+        matchedItemIndexes.forEach( index => {
+          const item = data[index] as { [key: string]: any};
+          item[keyName] = alignValue;
+        });
+      });
+    } else {
+      const isAlignValuePresent = values.some( value => {
+        const item = value.data as { [key: string]: any};
+        return item[keyName] === alignValue;
+      });
+
+      if (isAlignValuePresent) {
+        values.forEach( value => {
+          const item = value.data as { [key: string]: any};
+          item[keyName] = alignValue;
+        });
+      }
+    }
+  }
+
   private createInitialData (data: T) {
     if ( Array.isArray(data) ) {
       const dataArr = data as T[];
