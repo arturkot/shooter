@@ -10,18 +10,16 @@ import { updateEnemyInScene } from "./enemies";
 
 export default function (
   initialGameState: GameStateData,
+  lastGameState: GameStateData,
   bullets: Bullet[],
   enemies: Enemy[],
   els: Els,
   xShip: THREE.Mesh
 ) {
   const { gameOverEl, scoreEl } = els;
-  const score = initialGameState.score;
-  const lives= initialGameState.lives;
-  let gameStatus = initialGameState.gameStatus;
 
   if (isShoot) {
-    gameStatus = GameStatus.game;
+    lastGameState.gameStatus = GameStatus.game;
     resetUserEvents(200);
   }
 
@@ -33,18 +31,10 @@ export default function (
     els.livesEl.textContent = String(initialGameState.lives);
   }
 
-  updateScore(scoreEl, score);
+  updateScore(scoreEl, initialGameState.score);
   resetEnemiesAppearanceInScene(enemies);
   resetXShip(xShip, settings.XSHIP_Y);
 
   enemies.forEach( enemy => updateEnemyInScene(enemy) );
   bullets.forEach( bullet => updateBulletInScene(bullet) );
-
-  return {
-    gameStateData: {
-      gameStatus,
-      score,
-      lives
-    }, bullets, enemies
- };
 }

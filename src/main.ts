@@ -77,34 +77,26 @@ parsedResults.then(assets => {
 
     switch (lastGameState.gameStatus) {
       case GameStatus.initial: {
-        const {
-          gameStateData,
-          bullets,
-          enemies
-        } = initialScene(initialGameState, initialBullets, initialEnemies, els, xShip);
+        initialScene(initialGameState, lastGameState, initialBullets, initialEnemies, els, xShip);
 
         bulletsState.reset();
-        bulletsState.add(bullets);
+        bulletsState.add(initialBullets);
 
         enemiesState.reset();
-        enemiesState.add(enemies);
+        enemiesState.add(initialEnemies);
 
         gameState.reset();
-        gameState.add(gameStateData);
-        gameStatesCache.add(gameStateData);
+        gameState.add(lastGameState);
+        gameStatesCache.add(lastGameState);
         break;
       }
       case GameStatus.gameOver: {
         gameState.reset();
-        const {
-          gameStateData,
-          bullets,
-          enemies
-        } = gameOverScene(lastGameState, lastBullets, lastEnemies, els, xShip);
-        bulletsState.add(bullets);
-        enemiesState.add(enemies);
-        gameState.add(gameStateData);
-        gameStatesCache.add(gameStateData);
+        gameOverScene(lastGameState, lastBullets, lastEnemies, els, xShip);
+        bulletsState.add(lastBullets);
+        enemiesState.add(lastEnemies);
+        gameState.add(lastGameState);
+        gameStatesCache.add(lastGameState);
         break;
       }
       case GameStatus.autoRewind: {

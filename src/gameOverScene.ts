@@ -1,16 +1,9 @@
 import {Els, GameStateData} from './main';
-import { GameStatus } from './gameState';
-import { isShoot, resetUserEvents } from './userEvents';
-import { destroyXShip } from "./xShip";
-import {
-  Bullet,
-  getFreeBulletId, updateBullet, updateBulletInScene
-} from "./bullets";
-import {
-  Enemy,
-  getFreeEnemyId, updateEnemy, updateEnemyInScene
-} from "./enemies";
-import {LIVES} from './settings';
+import {GameStatus} from './gameState';
+import {isShoot, resetUserEvents} from './userEvents';
+import {destroyXShip} from './xShip';
+import {Bullet, getFreeBulletId, updateBullet, updateBulletInScene} from './bullets';
+import {Enemy, getFreeEnemyId, updateEnemy, updateEnemyInScene} from './enemies';
 
 export default function (
   gameState: GameStateData,
@@ -22,14 +15,14 @@ export default function (
   const { gameOverEl } = els;
   const freeBulletId = getFreeBulletId(bullets, isShoot);
   const freeEnemyId = getFreeEnemyId(enemies);
-  const newBullets = bullets
-    .map( bullet => updateBullet(bullet, freeBulletId, xShip.position.x) );
-  const newEnemies = enemies
-    .map( enemy => updateEnemy(enemy, freeEnemyId) );
-  let gameStatus = gameState.gameStatus;
+
+  bullets
+    .forEach( bullet => updateBullet(bullet, freeBulletId, xShip.position.x) );
+  enemies
+    .forEach( enemy => updateEnemy(enemy, freeEnemyId) );
 
   if (isShoot) {
-    gameStatus = GameStatus.initial;
+    gameState.gameStatus = GameStatus.initial;
     resetUserEvents();
   }
 
@@ -39,16 +32,6 @@ export default function (
 
   destroyXShip(xShip);
 
-  newEnemies.forEach( enemy => updateEnemyInScene(enemy) );
-  newBullets.forEach( bullet => updateBulletInScene(bullet) );
-
-  return {
-    gameStateData: {
-      score: gameState.score,
-      gameStatus,
-      lives: LIVES
-    },
-    bullets: newBullets,
-    enemies: newEnemies
-  };
+  enemies.forEach( enemy => updateEnemyInScene(enemy) );
+  bullets.forEach( bullet => updateBulletInScene(bullet) );
 }
