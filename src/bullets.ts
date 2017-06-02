@@ -1,16 +1,16 @@
 import * as settings from './settings';
 import {range} from 'lodash';
-import {Enemy, enemyElements} from './enemies';
-import {circlePointCollision, rectIntersect} from './collisionDetection';
+import {Enemy} from './enemies';
+import {circlePointCollision} from './collisionDetection';
 import {timeUnit} from './gameLoop';
 
 export interface Bullet {
-  readonly id: number;
-  readonly x: number;
-  readonly y: number;
-  readonly height: number;
-  readonly isActive: boolean;
-  readonly emittedAt?: number;
+  id: number;
+  x: number;
+  y: number;
+  height: number;
+  isActive: boolean;
+  emittedAt?: number;
 };
 
 export const bulletElements: THREE.Mesh[] = [];
@@ -114,36 +114,29 @@ export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: En
 }: {
   collisionCallback?: (enemy: Enemy) => void
 } = {}) {
-  let { isActive } = bullet;
-  enemies.filter(enemy => {
+  if (!bullet.isActive) {
+    return;
+  }
+
+  enemies.forEach(enemy => {
     const enemyRange = {
       x: enemy.x,
       y: enemy.y,
-      radius: 1
+      radius: 0.8
     };
 
-    return enemy.isActive && circlePointCollision(bullet.x, bullet.y, enemyRange);
-  }).forEach(enemy => {
-    const enemyElement = enemyElements.find(element => element.id === enemy.id);
-    const bulletElement = bulletElements.find(element => element.id === bullet.id);
-
-    if (!enemyElement || !bulletElement) {
-      return;
-    }
-
-    const enemyBox = new THREE.Box3().setFromObject(enemyElement);
-    const bulletBox = new THREE.Box3().setFromObject(bulletElement);
-
-    if ( rectIntersect(enemyBox, bulletBox) ) {
-      isActive = false;
+    if (
+      enemy.isActive &&
+      !enemy.isDestroyed &&
+      circlePointCollision(bullet.x, bullet.y, enemyRange)
+    ) {
+      bullet.isActive = false;
 
       if (collisionCallback) {
         collisionCallback(enemy);
       }
     }
   });
-
-  return Object.assign(bullet, { isActive });
 }
 
 export function updateBulletInScene (bullet: Bullet) {
