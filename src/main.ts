@@ -56,10 +56,10 @@ parsedResults.then(assets => {
     score: DEFAULT_SCORE,
     lives: LIVES
   };
-  const bulletsState = new GameState(1, initialBullets);
-  const prevBulletsStates = new GameState(100, initialBullets);
-  const enemiesState = new GameState(1, initialEnemies);
-  const prevEnemiesStates = new GameState(100, initialEnemies);
+  const bulletsState = new GameState<Bullet[]>(1, initialBullets);
+  const prevBulletsStates = new GameState<Bullet[]>(100, initialBullets);
+  const enemiesState = new GameState<Enemy[]>(1, initialEnemies);
+  const prevEnemiesStates = new GameState<Enemy[]>(100, initialEnemies);
   const gameState = new GameState(1, initialGameState);
   const gameStatesCache = new GameState(2, initialGameState);
   const prevGameStates = new GameState(100, initialGameState);
@@ -68,10 +68,10 @@ parsedResults.then(assets => {
   gameLoop(render);
 
   function render() {
-    const lastBullets = bulletsState.get() as Bullet[];
-    const lastEnemies = enemiesState.get() as Enemy[];
-    const prevGameState = gameStatesCache.get(1) as GameStateData;
-    const lastGameState = gameState.get() as GameStateData;
+    const lastBullets = bulletsState.get();
+    const lastEnemies = enemiesState.get();
+    const prevGameState = gameStatesCache.get(1);
+    const lastGameState = gameState.get();
 
     clockUpdate();
 

@@ -21,6 +21,18 @@ describe(`gameState`, () => {
     expect(gameState.get()).toEqual({ ...initialGameState, score: 1});
   });
 
+  it(`should add new array entry to the state`, () => {
+    const gameState = new GameState(1, [initialGameState]);
+    const newState = {
+      gameStatus: GameStatus.gameOver,
+      score: 22,
+      lives: 44
+    } as GameStateData;
+
+    gameState.add([newState]);
+    expect(gameState.get()).toEqual([newState]);
+  });
+
   it(`should return the latest entry`, () => {
     const gameState = new GameState(1, initialGameState);
 
@@ -193,9 +205,9 @@ describe(`gameState`, () => {
         }
       ];
 
-      const gameState = new GameState(44, initialGameState);
-      const itemA = gameState.get(22) as Item[];
-      const itemC = gameState.get(10) as Item[];
+      const gameState = new GameState<Item[]>(44, initialGameState);
+      const itemA = gameState.get(22);
+      const itemC = gameState.get(10);
 
       itemA[0].a = 0;
       itemC[2].b = 11;
@@ -203,13 +215,13 @@ describe(`gameState`, () => {
       gameState.align('a', 0);
       gameState.align('b', 11);
 
-      const itemsA = gameState.values.map( value => value.data[0] as Item );
-      const itemsB = gameState.values.map( value => value.data[1] as Item );
-      const itemsC = gameState.values.map( value => value.data[2] as Item );
+      const itemsA = gameState.values.map( value => value.data[0] );
+      const itemsB = gameState.values.map( value => value.data[1] );
+      const itemsC = gameState.values.map( value => value.data[2] );
 
-      expect( itemsA.every( item => item.a === 0) ).toBeTruthy();
-      expect( itemsB.every( item => item.a === 33 && item.b === 44) ).toBeTruthy();
-      expect( itemsC.every( item => item.b === 11) ).toBeTruthy();
+      expect( itemsA.every( (item: Item) => item.a === 0) ).toBeTruthy();
+      expect( itemsB.every( (item: Item) => item.a === 33 && item.b === 44) ).toBeTruthy();
+      expect( itemsC.every( (item: Item) => item.b === 11) ).toBeTruthy();
     });
 
     it(`
@@ -227,7 +239,7 @@ describe(`gameState`, () => {
       };
 
       const gameState = new GameState(34, initialGameState);
-      const itemA = gameState.get(22) as Item;
+      const itemA = gameState.get(22);
 
       itemA.b = -33;
 
