@@ -9,7 +9,6 @@ import {Bullet, updateBulletInScene} from "./bullets";
 import { updateEnemyInScene } from "./enemies";
 
 export default function (
-  initialGameState: GameStateData,
   lastGameState: GameStateData,
   bullets: Bullet[],
   enemies: Enemy[],
@@ -28,10 +27,10 @@ export default function (
   }
 
   if (els.livesEl) {
-    els.livesEl.textContent = String(initialGameState.lives);
+    els.livesEl.textContent = String(lastGameState.lives);
   }
 
-  updateScore(scoreEl, initialGameState.score);
+  updateScore(scoreEl, lastGameState.score);
   resetEnemiesAppearanceInScene(enemies);
   resetXShip(xShip, settings.XSHIP_Y);
 

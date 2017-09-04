@@ -77,7 +77,11 @@ parsedResults.then(assets => {
 
     switch (lastGameState.gameStatus) {
       case GameStatus.initial: {
-        initialScene(initialGameState, lastGameState, initialBullets, initialEnemies, els, xShip);
+        if (prevGameState.gameStatus === GameStatus.gameOver) {
+          gameState.reset();
+        }
+
+        initialScene(lastGameState, initialBullets, initialEnemies, els, xShip);
 
         bulletsState.reset();
         bulletsState.add(initialBullets);
@@ -85,17 +89,13 @@ parsedResults.then(assets => {
         enemiesState.reset();
         enemiesState.add(initialEnemies);
 
-        gameState.reset();
-        gameState.add(lastGameState);
         gameStatesCache.add(lastGameState);
         break;
       }
       case GameStatus.gameOver: {
-        gameState.reset();
         gameOverScene(lastGameState, lastBullets, lastEnemies, els, xShip);
         bulletsState.add(lastBullets);
         enemiesState.add(lastEnemies);
-        gameState.add(lastGameState);
         gameStatesCache.add(lastGameState);
         break;
       }
