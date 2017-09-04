@@ -367,8 +367,8 @@ function _calculateScore (
     initialEnergy: number
   }
 ) {
-  const velocityScore = velocity || 1;
-  const sideForceScore = sideForce || 1;
+  const velocityScore = velocity || 0.01;
+  const sideForceScore = sideForce || 0.01;
 
-  return Math.ceil(level + velocityScore * 10 + sideForceScore * 10 + initialEnergy);
+  return Math.ceil(level + Math.pow(velocityScore, 3) * 100 + Math.pow(sideForceScore, 3) * 1000 + initialEnergy);
 }
