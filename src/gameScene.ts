@@ -12,6 +12,18 @@ import {updateHiScore, updateScore} from './score';
 import {blasterSound, explosionSound, hitSound, wooshSound} from './sounds';
 import {clockGet, clockReset} from './clock';
 
+function resetScoreMultiplierAndCountScore (lastGameState: GameStateData, els: Els) {
+  lastGameState.score += lastGameState.scoreChunk * lastGameState.scoreMultiplier;
+  updateScore(els.scoreEl, lastGameState.score);
+
+  lastGameState.scoreMultiplier = 0;
+  lastGameState.scoreChunk = 0;
+
+  if (els.bonusBarEl) {
+    els.bonusBarEl.classList.remove('is-active');
+  }
+}
+
 export default function (
   bullets: Bullet[],
   enemies: Enemy[],
@@ -61,7 +73,7 @@ export default function (
           lastGameState.gameStatus = GameStatus.autoRewind;
         }
 
-        lastGameState.score += enemy.score;
+        resetScoreMultiplierAndCountScore(lastGameState, els);
         enemiesHit.push(enemy.id);
         updateScore(scoreEl, lastGameState.score);
         updateHiScore(hiScoreEl, lastGameState.score);
@@ -74,17 +86,7 @@ export default function (
           blasterSound.seek(0).play();
         },
         bulletReachedScreenEndCallback () {
-          lastGameState.score += lastGameState.scoreChunk * lastGameState.scoreMultiplier;
-          updateScore(scoreEl, lastGameState.score);
-
-          lastGameState.scoreMultiplier = 0;
-          lastGameState.scoreChunk = 0;
-
-          if (els.lastScoreEl && els.scoreMultiplierEl && els.bonusBarEl) {
-            els.bonusBarEl.classList.remove('is-active');
-            els.lastScoreEl.textContent = String(lastGameState.scoreChunk);
-            els.scoreMultiplierEl.textContent = String(lastGameState.scoreMultiplier);
-          }
+          resetScoreMultiplierAndCountScore(lastGameState, els);
         }
       });
 
@@ -115,6 +117,7 @@ export default function (
             lastGameState.gameStatus = GameStatus.autoRewind;
           }
 
+          resetScoreMultiplierAndCountScore(lastGameState, els);
           updateHiScore(hiScoreEl, lastGameState.score);
           wooshSound.seek(0).play();
         },
