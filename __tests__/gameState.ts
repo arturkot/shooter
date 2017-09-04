@@ -5,6 +5,8 @@ import {GameStateData} from '../src/main';
 const initialGameState: GameStateData = {
   gameStatus: GameStatus.initial,
   score: DEFAULT_SCORE,
+  scoreChunk: DEFAULT_SCORE,
+  scoreMultiplier: 1,
   lives: LIVES
 };
 

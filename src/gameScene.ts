@@ -72,14 +72,26 @@ export default function (
       updateBullet(bullet, freeBulletId, xShip.position.x, {
         bulletEmittedCallback () {
           blasterSound.seek(0).play();
+        },
+        bulletReachedScreenEndCallback () {
+          lastGameState.score += lastGameState.scoreChunk * lastGameState.scoreMultiplier;
+          updateScore(scoreEl, lastGameState.score);
+
+          lastGameState.scoreMultiplier = 0;
+          lastGameState.scoreChunk = 0;
+
+          if (els.lastScoreEl && els.scoreMultiplierEl && els.bonusBarEl) {
+            els.bonusBarEl.classList.remove('is-active');
+            els.lastScoreEl.textContent = String(lastGameState.scoreChunk);
+            els.scoreMultiplierEl.textContent = String(lastGameState.scoreMultiplier);
+          }
         }
       });
 
       detectBulletCollisionAgainstEnemies(bullet, enemies, {
         collisionCallback: enemy => {
-          lastGameState.score += enemy.score;
+          lastGameState.scoreChunk += enemy.score;
           enemiesHit.push(enemy.id);
-          updateScore(scoreEl, lastGameState.score);
         }
       });
     });
@@ -108,6 +120,13 @@ export default function (
         },
         destroyedCallback: () => {
           explosionSound.seek(0).play();
+          lastGameState.scoreMultiplier += 1;
+
+          if (lastGameState.scoreMultiplier > 1 && els.lastScoreEl && els.scoreMultiplierEl && els.bonusBarEl) {
+            els.bonusBarEl.classList.add('is-active');
+            els.lastScoreEl.textContent = String(lastGameState.scoreChunk);
+            els.scoreMultiplierEl.textContent = String(lastGameState.scoreMultiplier);
+          }
         }
       });
     });

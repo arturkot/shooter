@@ -20,10 +20,15 @@ export interface Els {
   gameOverEl: Element | null;
   livesEl: Element | null;
   flashEl: Element | null;
+  lastScoreEl: Element | null;
+  scoreMultiplierEl: Element | null;
+  bonusBarEl: Element | null;
 }
 
 export interface GameStateData {
   score: number;
+  scoreMultiplier: number;
+  scoreChunk: number;
   gameStatus: GameStatus;
   lives: number;
 }
@@ -34,7 +39,10 @@ parsedResults.then(assets => {
     hiScoreEl: document.querySelector('.js-hi-score'),
     gameOverEl: document.querySelector('.js-game-over'),
     livesEl: document.querySelector('.js-lives'),
-    flashEl: document.querySelector('.js-flash')
+    flashEl: document.querySelector('.js-flash'),
+    lastScoreEl: document.querySelector('.js-last-score'),
+    scoreMultiplierEl: document.querySelector('.js-score-multiplier'),
+    bonusBarEl: document.querySelector('.js-bonus-bar')
   };
 
   const {
@@ -53,6 +61,8 @@ parsedResults.then(assets => {
   const sphereBg = addSphereBg(sphereBgGeo, scene);
   const initialGameState: GameStateData = {
     gameStatus: GameStatus.initial,
+    scoreMultiplier: 0,
+    scoreChunk: DEFAULT_SCORE,
     score: DEFAULT_SCORE,
     lives: LIVES
   };

@@ -71,12 +71,13 @@ export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
   defaultY = settings.XSHIP_Y,
   bulletSpeed = settings.BULLET_SPEED,
   maxBulletsOnScreen = settings.MAX_BULLETS_ON_SCREEN,
-  bulletEmittedCallback
+  bulletEmittedCallback, bulletReachedScreenEndCallback
 }: {
   defaultY?: number;
   bulletSpeed?: number;
   maxBulletsOnScreen?: number;
   bulletEmittedCallback?: (thisBullet: Bullet) => void;
+  bulletReachedScreenEndCallback?: (thisBullet: Bullet) => void;
 } = {}) {
   const updatedBullet = {
     x: bullet.x,
@@ -89,6 +90,10 @@ export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
     bullet.isActive &&
     bullet.y > bullet.height * maxBulletsOnScreen) {
     updatedBullet.isActive = false;
+
+    if (bulletReachedScreenEndCallback) {
+      bulletReachedScreenEndCallback(bullet);
+    }
   }
 
   if (bullet.isActive) {

@@ -144,6 +144,37 @@
       display: block;
       animation: flash 0.4s infinite linear;
     }
+
+    .bonus-bar {
+      transition: opacity 0.2s;
+      position: absolute;
+      top: 48px;
+      left: var(--boundary-width);
+      display: flex;
+      justify-content: center;
+      width: var(--game-width);
+      background: var(--bg-dark);
+      color: white;
+      padding: 2vh;
+      font-size: 5vh;
+      font-weight: 200;
+      opacity: 0;
+    }
+
+    .bonus-bar.is-active {
+      opacity: 1;
+    }
+
+    .bonus-bar__multiplier {
+      display: flex;
+      font-style: italic;
+    }
+
+    .bonus-bar__multiplier::before {
+      content: '×';
+      margin: 0 0.5em;
+      font-size: 4vh;
+    }
   </style>
 </head>
 <body>
@@ -152,6 +183,15 @@
     <div>Score: <span class="score__points js-score">0000</span></div>
     <div>Lives: <span class="score__points js-lives">0</span></div>
     <div>Hi-score: <span class="score__points js-hi-score">0000</span></div>
+  </div>
+  <div class="bonus-bar js-bonus-bar">
+    <div class="bonus-bar__score">
+      <div class="js-last-score">13</div>
+    </div>
+
+    <div class="bonus-bar__multiplier">
+      <div class="js-score-multiplier">4</div>
+    </div>
   </div>
   <div class="game-over js-game-over">Game Over</div>
   <div class="left-wing"></div>
