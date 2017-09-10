@@ -2,7 +2,7 @@ import {addXShip} from './render/xShip';
 import {scene} from './render/setup';
 import {Bullet, generateBullets} from './bullets';
 import {Enemy, generateEnemies} from './enemies';
-import {addSphereBg} from './sphereBg';
+import {addSphereBg} from './render/sphereBg';
 import {parsedResults} from './getAssets';
 import {updateHiScore} from './score';
 import initialScene from './initialScene';
@@ -67,9 +67,10 @@ parsedResults.then(assets => {
     shipPositionY: XSHIP_Y
   });
 
+  addSphereBg(sphereBgGeo, scene);
+
   const initialBullets = generateBullets(MAX_BULLETS, scene);
   const initialEnemies = generateEnemies(ENEMIES_WAVE, xTriangle, scene);
-  const sphereBg = addSphereBg(sphereBgGeo, scene);
   const initialGameState: GameStateData = {
     gameStatus: GameStatus.initial,
     scoreMultiplier: 0,
@@ -147,7 +148,6 @@ parsedResults.then(assets => {
           prevGameState,
           els,
           lastXShipState,
-          sphereBg
         );
 
         break;
@@ -158,8 +158,7 @@ parsedResults.then(assets => {
           lastGameState,
           prevGameState,
           els,
-          lastXShipState,
-          sphereBg
+          lastXShipState
         );
 
         if (lastGameState) {

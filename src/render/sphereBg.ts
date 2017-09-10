@@ -1,9 +1,11 @@
-import { deg } from "./utils";
-import {timeUnit} from './gameLoop';
+import { deg } from "../utils";
+import {timeUnit} from '../gameLoop';
 
 type Direction = 'back' | 'forward';
 
-export function animateSphereBg (sphereBg: THREE.Mesh, direction: Direction = 'forward') {
+export let sphereBg: THREE.Mesh;
+
+export function animateSphereBg (direction: Direction = 'forward') {
   switch (direction) {
     case 'forward':
       sphereBg.rotation.x += -0.01 * timeUnit;
@@ -22,7 +24,7 @@ export function addSphereBg (geometry: THREE.Geometry, scene: THREE.Scene) {
     shininess: 20,
     shading: THREE.FlatShading
   });
-  const sphereBg = new THREE.Mesh(geometry, material);
+  sphereBg = new THREE.Mesh(geometry, material);
 
   sphereBg.position.x = 0;
   sphereBg.position.y = 0;

@@ -7,7 +7,6 @@ import {
   updateBulletInScene
 } from './bullets';
 import {Enemy, getFreeEnemyId, handleEnemyCollision, rebornEnemies, updateEnemy, updateEnemyInScene} from './enemies';
-import {animateSphereBg} from './sphereBg';
 import {updateHiScore, updateScore} from './score';
 import {blasterSound, explosionSound, hitSound, wooshSound} from './sounds';
 import {clockGet, clockReset} from './clock';
@@ -31,7 +30,6 @@ export default function (
   prevGameState: GameStateData,
   els: Els,
   lastXShipState: XShipStateData,
-  sphereBg: THREE.Mesh
 ) {
   if (prevGameState.gameStatus === GameStatus.autoRewind) {
     clockReset();
@@ -140,7 +138,5 @@ export default function (
     moveXShip(lastXShipState, isMoveLeft, isMoveRight, {
       mouseX
     });
-
-    animateSphereBg(sphereBg);
   }
 }

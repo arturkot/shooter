@@ -3,7 +3,6 @@ import {GameState, GameStatus} from './gameState';
 import {Els, GameStateData, XShipStateData} from './main';
 import {Enemy, updateEnemyInScene} from './enemies';
 import {Bullet, updateBulletInScene} from './bullets';
-import {animateSphereBg} from './sphereBg';
 import {moveXShip} from './xShip';
 import {isMoveLeft, isMoveRight, mouseX} from './userEvents';
 
@@ -19,7 +18,6 @@ export default function (
   prevGameState: GameStateData,
   els: Els,
   lastXShipState: XShipStateData,
-  sphereBg: THREE.Mesh
 ) {
   if (prevGameState.gameStatus !== lastGameState.gameStatus) {
     clockReset();
@@ -52,7 +50,6 @@ export default function (
         els.flashEl.classList.remove('is-active');
       }
 
-      animateSphereBg(sphereBg, 'back');
       moveXShip(lastXShipState, isMoveLeft, isMoveRight, {
         mouseX
       });
