@@ -2,7 +2,7 @@ import {Els, GameStateData, XShipStateData} from './main';
 import {GameStatus} from './gameState';
 import {isShoot, resetUserEvents} from './userEvents';
 import {destroyXShip} from './xShip';
-import {Bullet, getFreeBulletId, updateBullet, updateBulletInScene} from './bullets';
+import {Bullet, getFreeBulletId, updateBullet} from './bullets';
 import {Enemy, getFreeEnemyId, updateEnemy, updateEnemyInScene} from './enemies';
 
 export default function (
@@ -33,5 +33,4 @@ export default function (
   destroyXShip(lastXShipState);
 
   enemies.forEach( enemy => updateEnemyInScene(enemy) );
-  bullets.forEach( bullet => updateBulletInScene(bullet) );
 }

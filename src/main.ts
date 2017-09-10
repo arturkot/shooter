@@ -14,6 +14,7 @@ import {clockUpdate} from './clock';
 import {GameState, GameStatus} from './gameState';
 import {gameLoop} from './gameLoop';
 import {updateRender} from './render';
+import {addBullets} from './render/bullets';
 
 export interface Els {
   scoreEl: Element | null;
@@ -60,6 +61,7 @@ parsedResults.then(assets => {
     xShipCloud, xShipBody, xShipRear,
     xTriangle, xChunk, sphereBgGeo
   } = assets;
+  const initialBullets = generateBullets(MAX_BULLETS);
 
   addXShip({
     xShipCloud, xShipBody, xShipRear,
@@ -69,7 +71,8 @@ parsedResults.then(assets => {
 
   addSphereBg(sphereBgGeo, scene);
 
-  const initialBullets = generateBullets(MAX_BULLETS, scene);
+  addBullets(initialBullets);
+
   const initialEnemies = generateEnemies(ENEMIES_WAVE, xTriangle, scene);
   const initialGameState: GameStateData = {
     gameStatus: GameStatus.initial,
@@ -114,7 +117,7 @@ parsedResults.then(assets => {
           gameState.reset();
         }
 
-        initialScene(lastGameState, initialBullets, initialEnemies, els);
+        initialScene(lastGameState, initialEnemies, els);
 
         xShipState.reset();
         xShipState.add(initialXShipState);
@@ -174,6 +177,6 @@ parsedResults.then(assets => {
       }
     }
 
-    updateRender(lastGameState, lastXShipState);
+    updateRender(lastGameState, lastXShipState, lastBullets, prevBulletsStates);
   }
 });

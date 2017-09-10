@@ -3,8 +3,7 @@ import {GameStatus} from './gameState';
 import {isMoveLeft, isMoveRight, mouseX, resetUserEvents} from './userEvents';
 import {detectEnemyCollisionAgainstXShip, moveXShip} from './xShip';
 import {
-  Bullet, detectBulletCollisionAgainstEnemies, getFreeBulletId, updateBullet,
-  updateBulletInScene
+  Bullet, detectBulletCollisionAgainstEnemies, getFreeBulletId, updateBullet
 } from './bullets';
 import {Enemy, getFreeEnemyId, handleEnemyCollision, rebornEnemies, updateEnemy, updateEnemyInScene} from './enemies';
 import {updateHiScore, updateScore} from './score';
@@ -132,7 +131,6 @@ export default function (
       });
     });
 
-    bullets.forEach(bullet => updateBulletInScene(bullet));
     enemies.forEach(enemy => updateEnemyInScene(enemy));
 
     moveXShip(lastXShipState, isMoveLeft, isMoveRight, {

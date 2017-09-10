@@ -1,5 +1,6 @@
 import { deg } from "../utils";
 import {timeUnit} from '../gameLoop';
+import {scene} from './setup';
 
 type Direction = 'back' | 'forward';
 
@@ -17,7 +18,7 @@ export function animateSphereBg (direction: Direction = 'forward') {
   }
 }
 
-export function addSphereBg (geometry: THREE.Geometry, scene: THREE.Scene) {
+export function addSphereBg (geometry: THREE.Geometry) {
   const material = new THREE.MeshPhongMaterial({
     color: 0x0B1687,
     side: THREE.BackSide,

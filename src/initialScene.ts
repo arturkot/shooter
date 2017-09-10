@@ -3,12 +3,10 @@ import {Els, GameStateData} from './main';
 import { GameStatus } from './gameState';
 import { updateScore } from "./score";
 import {Enemy, resetEnemiesAppearanceInScene} from "./enemies";
-import {Bullet, updateBulletInScene} from "./bullets";
 import { updateEnemyInScene } from "./enemies";
 
 export default function (
   lastGameState: GameStateData,
-  bullets: Bullet[],
   enemies: Enemy[],
   els: Els
 ) {
@@ -31,5 +29,4 @@ export default function (
   resetEnemiesAppearanceInScene(enemies);
 
   enemies.forEach( enemy => updateEnemyInScene(enemy) );
-  bullets.forEach( bullet => updateBulletInScene(bullet) );
 }

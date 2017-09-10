@@ -11,35 +11,21 @@ export interface Bullet {
   height: number;
   isActive: boolean;
   emittedAt?: number;
-};
+}
 
-export const bulletElements: THREE.Mesh[] = [];
-
-export function generateBullets (maxNr: number, scene: THREE.Scene) {
+export function generateBullets (maxNr: number) {
   const OFFSCREEN = 9999;
   const array = range(maxNr);
-  const bullets = array.map( () => {
-    const geometry = new THREE.ConeGeometry(0.1, 0.6, 8);
-    const material = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    const element = new THREE.Mesh(geometry, material);
 
-    element.position.y = OFFSCREEN;
-    scene.add(element);
-    bulletElements.push(element);
-
-    const bullet: Bullet = {
-      id: element.id,
+  return array.map( number => ({
+      id: number,
       x: OFFSCREEN,
       y: OFFSCREEN,
-      height: new THREE.Box3().setFromObject(element).getSize().y,
+      height: 0.6,
       isActive: false,
       emittedAt: undefined
-    };
-
-    return bullet;
-  });
-
-  return bullets;
+    })
+  );
 }
 
 export function getFreeBulletId (bullets: Bullet[], isShoot: boolean) {
@@ -142,20 +128,4 @@ export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: En
       }
     }
   });
-}
-
-export function updateBulletInScene (bullet: Bullet) {
-  const OFFSCREEN = 9999;
-  const element = bulletElements.find(element => element.id === bullet.id);
-
-  if (!element) {
-    return;
-  }
-
-  if (bullet.isActive) {
-    element.position.x = bullet.x;
-    element.position.y = bullet.y;
-  } else {
-    element.position.y = OFFSCREEN;
-  }
 }

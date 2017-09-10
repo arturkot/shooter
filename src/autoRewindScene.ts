@@ -2,7 +2,7 @@ import {clockGet, clockReset} from './clock';
 import {GameState, GameStatus} from './gameState';
 import {Els, GameStateData, XShipStateData} from './main';
 import {Enemy, updateEnemyInScene} from './enemies';
-import {Bullet, updateBulletInScene} from './bullets';
+import {Bullet} from './bullets';
 import {moveXShip} from './xShip';
 import {isMoveLeft, isMoveRight, mouseX} from './userEvents';
 
@@ -36,12 +36,10 @@ export default function (
   }
 
   if (clockGet() > 0.5) {
-    const prevBullets = prevBulletsStates.use() as Bullet[];
     const prevEnemies = prevEnemiesStates.use() as Enemy[];
     const prevState = prevGameStates.use();
 
-    if (prevBullets && prevEnemies) {
-      prevBullets.forEach(bullet => updateBulletInScene(bullet));
+    if (prevEnemies) {
       prevEnemies.forEach(enemy => updateEnemyInScene(enemy));
     }
 
