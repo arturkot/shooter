@@ -1,4 +1,4 @@
-import {Els, GameStateData} from './main';
+import {Els, GameStateData, XShipStateData} from './main';
 import {GameStatus} from './gameState';
 import {isShoot, resetUserEvents} from './userEvents';
 import {destroyXShip} from './xShip';
@@ -10,14 +10,14 @@ export default function (
   bullets: Bullet[],
   enemies: Enemy[],
   els: Els,
-  xShip: THREE.Mesh
+  lastXShipState: XShipStateData
 ) {
   const { gameOverEl } = els;
   const freeBulletId = getFreeBulletId(bullets, isShoot);
   const freeEnemyId = getFreeEnemyId(enemies);
 
   bullets
-    .forEach( bullet => updateBullet(bullet, freeBulletId, xShip.position.x) );
+    .forEach( bullet => updateBullet(bullet, freeBulletId, lastXShipState.positionX) );
   enemies
     .forEach( enemy => updateEnemy(enemy, freeEnemyId) );
 
@@ -30,7 +30,7 @@ export default function (
     gameOverEl.classList.add('is-show');
   }
 
-  destroyXShip(xShip);
+  destroyXShip(lastXShipState);
 
   enemies.forEach( enemy => updateEnemyInScene(enemy) );
   bullets.forEach( bullet => updateBulletInScene(bullet) );

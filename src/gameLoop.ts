@@ -1,5 +1,5 @@
 import {ENABLE_STATS} from './settings';
-import {camera, renderer, scene} from './setup';
+import {camera, renderer, scene} from './render/setup';
 
 const FPS = 60;
 const INTERVAL = 1000 / FPS;

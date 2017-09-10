@@ -1,6 +1,6 @@
 import {clockGet, clockReset} from './clock';
 import {GameState, GameStatus} from './gameState';
-import {Els, GameStateData} from './main';
+import {Els, GameStateData, XShipStateData} from './main';
 import {Enemy, updateEnemyInScene} from './enemies';
 import {Bullet, updateBulletInScene} from './bullets';
 import {animateSphereBg} from './sphereBg';
@@ -18,7 +18,7 @@ export default function (
   lastGameState: GameStateData,
   prevGameState: GameStateData,
   els: Els,
-  xShip: THREE.Mesh,
+  lastXShipState: XShipStateData,
   sphereBg: THREE.Mesh
 ) {
   if (prevGameState.gameStatus !== lastGameState.gameStatus) {
@@ -53,7 +53,7 @@ export default function (
       }
 
       animateSphereBg(sphereBg, 'back');
-      moveXShip(xShip, isMoveLeft, isMoveRight, {
+      moveXShip(lastXShipState, isMoveLeft, isMoveRight, {
         mouseX
       });
     } else {

@@ -1,5 +1,5 @@
-import {scene} from './setup';
-import {addXShip} from './xShip';
+import {addXShip} from './render/xShip';
+import {scene} from './render/setup';
 import {Bullet, generateBullets} from './bullets';
 import {Enemy, generateEnemies} from './enemies';
 import {addSphereBg} from './sphereBg';
@@ -13,6 +13,7 @@ import {DEFAULT_SCORE, ENEMIES_WAVE, LIVES, MAX_BULLETS, XSHIP_Y} from './settin
 import {clockUpdate} from './clock';
 import {GameState, GameStatus} from './gameState';
 import {gameLoop} from './gameLoop';
+import {updateRender} from './render';
 
 export interface Els {
   scoreEl: Element | null;
@@ -33,6 +34,16 @@ export interface GameStateData {
   lives: number;
 }
 
+export interface XShipStateData {
+  positionX: number;
+  positionY: number;
+  rotationY: number;
+  scaleX: number;
+  scaleY: number;
+  scaleZ: number;
+  opacity: number;
+}
+
 parsedResults.then(assets => {
   const els: Els = {
     scoreEl: document.querySelector('.js-score'),
@@ -50,9 +61,9 @@ parsedResults.then(assets => {
     xTriangle, xChunk, sphereBgGeo
   } = assets;
 
-  const xShip = addXShip({
+  addXShip({
     xShipCloud, xShipBody, xShipRear,
-    xTriangle, xChunk, scene,
+    xTriangle, xChunk,
     shipPositionY: XSHIP_Y
   });
 
@@ -66,6 +77,16 @@ parsedResults.then(assets => {
     score: DEFAULT_SCORE,
     lives: LIVES
   };
+  const initialXShipState: XShipStateData = {
+    positionX: 0,
+    positionY: XSHIP_Y,
+    rotationY: 0,
+    scaleX: 1,
+    scaleY: 1,
+    scaleZ: 1,
+    opacity: 1
+  };
+  const xShipState = new GameState(1, initialXShipState);
   const bulletsState = new GameState<Bullet[]>(1, initialBullets);
   const prevBulletsStates = new GameState<Bullet[]>(100, initialBullets);
   const enemiesState = new GameState<Enemy[]>(1, initialEnemies);
@@ -78,6 +99,7 @@ parsedResults.then(assets => {
   gameLoop(render);
 
   function render() {
+    const lastXShipState = xShipState.get();
     const lastBullets = bulletsState.get();
     const lastEnemies = enemiesState.get();
     const prevGameState = gameStatesCache.get(1);
@@ -91,7 +113,10 @@ parsedResults.then(assets => {
           gameState.reset();
         }
 
-        initialScene(lastGameState, initialBullets, initialEnemies, els, xShip);
+        initialScene(lastGameState, initialBullets, initialEnemies, els);
+
+        xShipState.reset();
+        xShipState.add(initialXShipState);
 
         bulletsState.reset();
         bulletsState.add(initialBullets);
@@ -103,7 +128,7 @@ parsedResults.then(assets => {
         break;
       }
       case GameStatus.gameOver: {
-        gameOverScene(lastGameState, lastBullets, lastEnemies, els, xShip);
+        gameOverScene(lastGameState, lastBullets, lastEnemies, els, lastXShipState);
         bulletsState.add(lastBullets);
         enemiesState.add(lastEnemies);
         gameStatesCache.add(lastGameState);
@@ -121,7 +146,7 @@ parsedResults.then(assets => {
           lastGameState,
           prevGameState,
           els,
-          xShip,
+          lastXShipState,
           sphereBg
         );
 
@@ -133,7 +158,7 @@ parsedResults.then(assets => {
           lastGameState,
           prevGameState,
           els,
-          xShip,
+          lastXShipState,
           sphereBg
         );
 
@@ -149,5 +174,7 @@ parsedResults.then(assets => {
         }
       }
     }
+
+    updateRender(lastGameState, lastXShipState);
   }
 });

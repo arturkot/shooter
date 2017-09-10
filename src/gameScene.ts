@@ -1,4 +1,4 @@
-import {Els, GameStateData} from './main';
+import {Els, GameStateData, XShipStateData} from './main';
 import {GameStatus} from './gameState';
 import {isMoveLeft, isMoveRight, mouseX, resetUserEvents} from './userEvents';
 import {detectEnemyCollisionAgainstXShip, moveXShip} from './xShip';
@@ -30,7 +30,7 @@ export default function (
   lastGameState: GameStateData,
   prevGameState: GameStateData,
   els: Els,
-  xShip: THREE.Mesh,
+  lastXShipState: XShipStateData,
   sphereBg: THREE.Mesh
 ) {
   if (prevGameState.gameStatus === GameStatus.autoRewind) {
@@ -61,7 +61,7 @@ export default function (
     const freeBulletId = getFreeBulletId(bullets, true);
     const freeEnemyId = getFreeEnemyId(enemies);
 
-    detectEnemyCollisionAgainstXShip(xShip, enemies, {
+    detectEnemyCollisionAgainstXShip(lastXShipState, enemies, {
       collisionCallback: enemy => {
         lastGameState.lives = lastGameState.lives - 1;
 
@@ -81,7 +81,7 @@ export default function (
     });
 
     bullets.forEach( bullet => {
-      updateBullet(bullet, freeBulletId, xShip.position.x, {
+      updateBullet(bullet, freeBulletId, lastXShipState.positionX, {
         bulletEmittedCallback () {
           blasterSound.seek(0).play();
         },
@@ -137,7 +137,7 @@ export default function (
     bullets.forEach(bullet => updateBulletInScene(bullet));
     enemies.forEach(enemy => updateEnemyInScene(enemy));
 
-    moveXShip(xShip, isMoveLeft, isMoveRight, {
+    moveXShip(lastXShipState, isMoveLeft, isMoveRight, {
       mouseX
     });
 
