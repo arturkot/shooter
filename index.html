@@ -83,10 +83,12 @@
       display: flex;
       justify-content: space-between;
       width: var(--game-width);
+      height: 6.8vh;
       background: var(--bg-dark);
       color: white;
       padding: 2vh;
       font-size: 2.4vh;
+      line-height: 1;
     }
       @media (max-width: 769px) {
         .score {
@@ -148,7 +150,7 @@
     .bonus-bar {
       transition: opacity 0.2s;
       position: absolute;
-      top: 48px;
+      top: 6.8vh;
       left: var(--boundary-width);
       display: flex;
       justify-content: center;
@@ -160,6 +162,13 @@
       font-weight: 200;
       opacity: 0;
     }
+
+      @media (max-width: 769px) {
+        .bonus-bar {
+          width: 100%;
+          left: 0;
+        }
+      }
 
     .bonus-bar.is-active {
       opacity: 1;
