@@ -38,6 +38,11 @@ export default function (
   if (clockGet() > 0.5) {
     const prevEnemies = prevEnemiesStates.use() as Enemy[];
     const prevState = prevGameStates.use();
+    const prevBulletsState = prevBulletsStates.use();
+
+    if (prevBulletsState) {
+      bulletsState.add(prevBulletsState);
+    }
 
     if (prevEnemies) {
       prevEnemies.forEach(enemy => updateEnemyInScene(enemy));

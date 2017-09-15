@@ -177,6 +177,6 @@ parsedResults.then(assets => {
       }
     }
 
-    updateRender(lastGameState, lastXShipState, lastBullets, prevBulletsStates);
+    updateRender(lastGameState, lastXShipState, lastBullets);
   }
 });
