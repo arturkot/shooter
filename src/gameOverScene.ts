@@ -3,7 +3,7 @@ import {GameStatus} from './gameState';
 import {isShoot, resetUserEvents} from './userEvents';
 import {destroyXShip} from './xShip';
 import {Bullet, getFreeBulletId, updateBullet} from './bullets';
-import {Enemy, getFreeEnemyId, updateEnemy, updateEnemyInScene} from './enemies';
+import {Enemy, getFreeEnemyId, updateEnemy} from './enemies';
 
 export default function (
   gameState: GameStateData,
@@ -31,6 +31,4 @@ export default function (
   }
 
   destroyXShip(lastXShipState);
-
-  enemies.forEach( enemy => updateEnemyInScene(enemy) );
 }

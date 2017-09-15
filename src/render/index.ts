@@ -4,11 +4,14 @@ import { updateXShip } from './xShip';
 import { animateSphereBg } from './sphereBg';
 import {updateBullet} from './bullets';
 import {Bullet} from '../bullets';
+import {updateEnemyInScene} from './enemies';
+import {Enemy} from '../enemies';
 
 export function updateRender(
   gameState: GameStateData,
   xShipState: XShipStateData,
-  bulletStates: Bullet[]
+  bulletStates: Bullet[],
+  enemiesState: Enemy[]
 ) {
   if (
     gameState.gameStatus === GameStatus.autoRewind ||
@@ -16,6 +19,7 @@ export function updateRender(
     gameState.gameStatus === GameStatus.gameOver
   ) {
     updateXShip(xShipState);
+    enemiesState.forEach(enemy => updateEnemyInScene(enemy));
   }
 
   if (

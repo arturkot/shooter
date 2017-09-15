@@ -1,7 +1,7 @@
 import {clockGet, clockReset} from './clock';
 import {GameState, GameStatus} from './gameState';
 import {Els, GameStateData, XShipStateData} from './main';
-import {Enemy, updateEnemyInScene} from './enemies';
+import {Enemy} from './enemies';
 import {Bullet} from './bullets';
 import {moveXShip} from './xShip';
 import {isMoveLeft, isMoveRight, mouseX} from './userEvents';
@@ -45,7 +45,7 @@ export default function (
     }
 
     if (prevEnemies) {
-      prevEnemies.forEach(enemy => updateEnemyInScene(enemy));
+      enemiesState.add(prevEnemies);
     }
 
     if (prevState) {

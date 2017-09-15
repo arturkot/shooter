@@ -1,5 +1,4 @@
 import {addXShip} from './render/xShip';
-import {scene} from './render/setup';
 import {Bullet, generateBullets} from './bullets';
 import {Enemy, generateEnemies} from './enemies';
 import {addSphereBg} from './render/sphereBg';
@@ -15,6 +14,7 @@ import {GameState, GameStatus} from './gameState';
 import {gameLoop} from './gameLoop';
 import {updateRender} from './render';
 import {addBullets} from './render/bullets';
+import {addEnemies} from './render/enemies';
 
 export interface Els {
   scoreEl: Element | null;
@@ -62,18 +62,17 @@ parsedResults.then(assets => {
     xTriangle, xChunk, sphereBgGeo
   } = assets;
   const initialBullets = generateBullets(MAX_BULLETS);
+  const initialEnemies = generateEnemies(ENEMIES_WAVE);
 
   addXShip({
     xShipCloud, xShipBody, xShipRear,
     xTriangle, xChunk,
     shipPositionY: XSHIP_Y
   });
-
-  addSphereBg(sphereBgGeo, scene);
-
+  addSphereBg(sphereBgGeo);
   addBullets(initialBullets);
+  addEnemies(initialEnemies, xTriangle);
 
-  const initialEnemies = generateEnemies(ENEMIES_WAVE, xTriangle, scene);
   const initialGameState: GameStateData = {
     gameStatus: GameStatus.initial,
     scoreMultiplier: 0,
@@ -177,6 +176,6 @@ parsedResults.then(assets => {
       }
     }
 
-    updateRender(lastGameState, lastXShipState, lastBullets);
+    updateRender(lastGameState, lastXShipState, lastBullets, lastEnemies);
   }
 });

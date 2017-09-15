@@ -5,7 +5,7 @@ import {detectEnemyCollisionAgainstXShip, moveXShip} from './xShip';
 import {
   Bullet, detectBulletCollisionAgainstEnemies, getFreeBulletId, updateBullet
 } from './bullets';
-import {Enemy, getFreeEnemyId, handleEnemyCollision, rebornEnemies, updateEnemy, updateEnemyInScene} from './enemies';
+import {Enemy, getFreeEnemyId, handleEnemyCollision, rebornEnemies, updateEnemy} from './enemies';
 import {updateHiScore, updateScore} from './score';
 import {blasterSound, explosionSound, hitSound, wooshSound} from './sounds';
 import {clockGet, clockReset} from './clock';
@@ -130,8 +130,6 @@ export default function (
         }
       });
     });
-
-    enemies.forEach(enemy => updateEnemyInScene(enemy));
 
     moveXShip(lastXShipState, isMoveLeft, isMoveRight, {
       mouseX

@@ -2,8 +2,8 @@ import { isShoot, resetUserEvents } from "./userEvents";
 import {Els, GameStateData} from './main';
 import { GameStatus } from './gameState';
 import { updateScore } from "./score";
-import {Enemy, resetEnemiesAppearanceInScene} from "./enemies";
-import { updateEnemyInScene } from "./enemies";
+import {Enemy} from "./enemies";
+import {resetEnemiesAppearanceInScene, updateEnemyInScene} from "./render/enemies";
 
 export default function (
   lastGameState: GameStateData,
