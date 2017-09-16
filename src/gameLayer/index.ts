@@ -9,29 +9,29 @@ import {Enemy} from '../enemies';
 
 export function updateRender(
   gameState: GameStateData,
-  xShipState: XShipStateData,
-  bulletStates: Bullet[],
-  enemiesState: Enemy[]
+  xShip: XShipStateData,
+  bullets: Bullet[],
+  enemies: Enemy[]
 ) {
   if (
     gameState.gameStatus === GameStatus.autoRewind ||
     gameState.gameStatus === GameStatus.game ||
     gameState.gameStatus === GameStatus.gameOver
   ) {
-    updateXShip(xShipState);
-    enemiesState.forEach(enemy => updateEnemyInScene(enemy));
+    updateXShip(xShip);
+    enemies.forEach(enemy => updateEnemyInScene(enemy));
   }
 
   if (
     gameState.gameStatus === GameStatus.game ||
     gameState.gameStatus === GameStatus.gameOver
   ) {
-    bulletStates.forEach(updateBullet);
+    bullets.forEach(updateBullet);
   }
 
   if (gameState.gameStatus === GameStatus.autoRewind) {
     animateSphereBg('back');
-    bulletStates.forEach(updateBullet);
+    bullets.forEach(updateBullet);
   }
 
   if (gameState.gameStatus === GameStatus.game) {

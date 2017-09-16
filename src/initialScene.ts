@@ -3,7 +3,7 @@ import {Els, GameStateData} from './main';
 import { GameStatus } from './gameState';
 import { updateScore } from "./score";
 import {Enemy} from "./enemies";
-import {resetEnemiesAppearanceInScene, updateEnemyInScene} from "./render/enemies";
+import {resetEnemiesAppearanceInScene, updateEnemyInScene} from "./gameLayer/enemies";
 
 export default function (
   lastGameState: GameStateData,

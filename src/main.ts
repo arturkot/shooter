@@ -1,7 +1,7 @@
-import {addXShip} from './render/xShip';
+import {addXShip} from './gameLayer/xShip';
 import {Bullet, generateBullets} from './bullets';
 import {Enemy, generateEnemies} from './enemies';
-import {addSphereBg} from './render/sphereBg';
+import {addSphereBg} from './gameLayer/sphereBg';
 import {parsedResults} from './getAssets';
 import {updateHiScore} from './score';
 import initialScene from './initialScene';
@@ -12,9 +12,9 @@ import {DEFAULT_SCORE, ENEMIES_WAVE, LIVES, MAX_BULLETS, XSHIP_Y} from './settin
 import {clockUpdate} from './clock';
 import {GameState, GameStatus} from './gameState';
 import {gameLoop} from './gameLoop';
-import {updateRender} from './render';
-import {addBullets} from './render/bullets';
-import {addEnemies} from './render/enemies';
+import {updateRender} from './gameLayer';
+import {addBullets} from './gameLayer/bullets';
+import {addEnemies} from './gameLayer/enemies';
 
 export interface Els {
   scoreEl: Element | null;
