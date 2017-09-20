@@ -1,22 +1,28 @@
-import {addXShip} from './gameLayer/xShip';
-import {Bullet, generateBullets} from './bullets';
-import {Enemy, generateEnemies} from './enemies';
-import {addSphereBg} from './gameLayer/sphereBg';
-import {parsedResults} from './getAssets';
-import {updateHiScore} from './score';
-import initialScene from './initialScene';
-import gameOverScene from './gameOverScene';
 import autoRewindScene from './autoRewindScene';
+import { generateBullets, IBullet } from './bullets';
+import { clockUpdate } from './clock';
+import { generateEnemies, IEnemy } from './enemies';
+import { updateRender } from './gameLayer';
+import { addBullets } from './gameLayer/bullets';
+import { addEnemies } from './gameLayer/enemies';
+import { addSphereBg } from './gameLayer/sphereBg';
+import { addXShip } from './gameLayer/xShip';
+import { gameLoop } from './gameLoop';
+import gameOverScene from './gameOverScene';
 import gameScene from './gameScene';
-import {DEFAULT_SCORE, ENEMIES_WAVE, LIVES, MAX_BULLETS, XSHIP_Y} from './settings';
-import {clockUpdate} from './clock';
-import {GameState, GameStatus} from './gameState';
-import {gameLoop} from './gameLoop';
-import {updateRender} from './gameLayer';
-import {addBullets} from './gameLayer/bullets';
-import {addEnemies} from './gameLayer/enemies';
+import { GameState, GameStatus } from './gameState';
+import { parsedResults } from './getAssets';
+import initialScene from './initialScene';
+import { updateHiScore } from './score';
+import {
+  DEFAULT_SCORE,
+  ENEMIES_WAVE,
+  LIVES,
+  MAX_BULLETS,
+  XSHIP_Y,
+} from './settings';
 
-export interface Els {
+export interface IEls {
   scoreEl: Element | null;
   hiScoreEl: Element | null;
   gameOverEl: Element | null;
@@ -27,7 +33,7 @@ export interface Els {
   bonusBarEl: Element | null;
 }
 
-export interface GameStateData {
+export interface IGameStateData {
   score: number;
   scoreMultiplier: number;
   scoreChunk: number;
@@ -35,7 +41,7 @@ export interface GameStateData {
   lives: number;
 }
 
-export interface XShipStateData {
+export interface IXShipStateData {
   positionX: number;
   positionY: number;
   rotationY: number;
@@ -46,7 +52,7 @@ export interface XShipStateData {
 }
 
 parsedResults.then(assets => {
-  const els: Els = {
+  const els: IEls = {
     scoreEl: document.querySelector('.js-score'),
     hiScoreEl: document.querySelector('.js-hi-score'),
     gameOverEl: document.querySelector('.js-game-over'),
@@ -54,46 +60,53 @@ parsedResults.then(assets => {
     flashEl: document.querySelector('.js-flash'),
     lastScoreEl: document.querySelector('.js-last-score'),
     scoreMultiplierEl: document.querySelector('.js-score-multiplier'),
-    bonusBarEl: document.querySelector('.js-bonus-bar')
+    bonusBarEl: document.querySelector('.js-bonus-bar'),
   };
 
   const {
-    xShipCloud, xShipBody, xShipRear,
-    xTriangle, xChunk, sphereBgGeo
+    xShipCloud,
+    xShipBody,
+    xShipRear,
+    xTriangle,
+    xChunk,
+    sphereBgGeo,
   } = assets;
   const initialBullets = generateBullets(MAX_BULLETS);
   const initialEnemies = generateEnemies(ENEMIES_WAVE);
 
   addXShip({
-    xShipCloud, xShipBody, xShipRear,
-    xTriangle, xChunk,
-    shipPositionY: XSHIP_Y
+    xShipCloud,
+    xShipBody,
+    xShipRear,
+    xTriangle,
+    xChunk,
+    shipPositionY: XSHIP_Y,
   });
   addSphereBg(sphereBgGeo);
   addBullets(initialBullets);
   addEnemies(initialEnemies, xTriangle);
 
-  const initialGameState: GameStateData = {
+  const initialGameState: IGameStateData = {
     gameStatus: GameStatus.initial,
     scoreMultiplier: 0,
     scoreChunk: DEFAULT_SCORE,
     score: DEFAULT_SCORE,
-    lives: LIVES
+    lives: LIVES,
   };
-  const initialXShipState: XShipStateData = {
+  const initialXShipState: IXShipStateData = {
     positionX: 0,
     positionY: XSHIP_Y,
     rotationY: 0,
     scaleX: 1,
     scaleY: 1,
     scaleZ: 1,
-    opacity: 1
+    opacity: 1,
   };
   const xShipState = new GameState(1, initialXShipState);
-  const bulletsState = new GameState<Bullet[]>(1, initialBullets);
-  const prevBulletsStates = new GameState<Bullet[]>(100, initialBullets);
-  const enemiesState = new GameState<Enemy[]>(1, initialEnemies);
-  const prevEnemiesStates = new GameState<Enemy[]>(100, initialEnemies);
+  const bulletsState = new GameState<IBullet[]>(1, initialBullets);
+  const prevBulletsStates = new GameState<IBullet[]>(100, initialBullets);
+  const enemiesState = new GameState<IEnemy[]>(1, initialEnemies);
+  const prevEnemiesStates = new GameState<IEnemy[]>(100, initialEnemies);
   const gameState = new GameState(1, initialGameState);
   const gameStatesCache = new GameState(2, initialGameState);
   const prevGameStates = new GameState(100, initialGameState);
@@ -131,7 +144,13 @@ parsedResults.then(assets => {
         break;
       }
       case GameStatus.gameOver: {
-        gameOverScene(lastGameState, lastBullets, lastEnemies, els, lastXShipState);
+        gameOverScene(
+          lastGameState,
+          lastBullets,
+          lastEnemies,
+          els,
+          lastXShipState
+        );
         bulletsState.add(lastBullets);
         enemiesState.add(lastEnemies);
         gameStatesCache.add(lastGameState);
@@ -149,11 +168,12 @@ parsedResults.then(assets => {
           lastGameState,
           prevGameState,
           els,
-          lastXShipState,
+          lastXShipState
         );
 
         break;
-      } case GameStatus.game: {
+      }
+      case GameStatus.game: {
         gameScene(
           lastBullets,
           lastEnemies,
@@ -173,6 +193,10 @@ parsedResults.then(assets => {
           gameStatesCache.add(lastGameState);
           prevGameStates.add(lastGameState);
         }
+        break;
+      }
+      default: {
+        break;
       }
     }
 

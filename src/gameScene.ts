@@ -1,17 +1,30 @@
-import {Els, GameStateData, XShipStateData} from './main';
-import {GameStatus} from './gameState';
-import {isMoveLeft, isMoveRight, mouseX, resetUserEvents} from './userEvents';
-import {detectEnemyCollisionAgainstXShip, moveXShip} from './xShip';
 import {
-  Bullet, detectBulletCollisionAgainstEnemies, getFreeBulletId, updateBullet
+  detectBulletCollisionAgainstEnemies,
+  getFreeBulletId,
+  IBullet,
+  updateBullet,
 } from './bullets';
-import {Enemy, getFreeEnemyId, handleEnemyCollision, rebornEnemies, updateEnemy} from './enemies';
-import {updateHiScore, updateScore} from './score';
-import {blasterSound, explosionSound, hitSound, wooshSound} from './sounds';
-import {clockGet, clockReset} from './clock';
+import { clockGet, clockReset } from './clock';
+import {
+  getFreeEnemyId,
+  handleEnemyCollision,
+  IEnemy,
+  rebornEnemies,
+  updateEnemy,
+} from './enemies';
+import { GameStatus } from './gameState';
+import { IEls, IGameStateData, IXShipStateData } from './main';
+import { updateHiScore, updateScore } from './score';
+import { blasterSound, explosionSound, hitSound, wooshSound } from './sounds';
+import { isMoveLeft, isMoveRight, mouseX, resetUserEvents } from './userEvents';
+import { detectEnemyCollisionAgainstXShip, moveXShip } from './xShip';
 
-function resetScoreMultiplierAndCountScore (lastGameState: GameStateData, els: Els) {
-  lastGameState.score += lastGameState.scoreChunk * lastGameState.scoreMultiplier;
+function resetScoreMultiplierAndCountScore(
+  lastGameState: IGameStateData,
+  els: IEls
+) {
+  lastGameState.score +=
+    lastGameState.scoreChunk * lastGameState.scoreMultiplier;
   updateScore(els.scoreEl, lastGameState.score);
 
   lastGameState.scoreMultiplier = 0;
@@ -22,13 +35,13 @@ function resetScoreMultiplierAndCountScore (lastGameState: GameStateData, els: E
   }
 }
 
-export default function (
-  bullets: Bullet[],
-  enemies: Enemy[],
-  lastGameState: GameStateData,
-  prevGameState: GameStateData,
-  els: Els,
-  lastXShipState: XShipStateData,
+export default function(
+  bullets: IBullet[],
+  enemies: IEnemy[],
+  lastGameState: IGameStateData,
+  prevGameState: IGameStateData,
+  els: IEls,
+  lastXShipState: IXShipStateData
 ) {
   if (prevGameState.gameStatus === GameStatus.autoRewind) {
     clockReset();
@@ -38,13 +51,13 @@ export default function (
     }
 
     const newGameState = Object.assign(lastGameState, {
-      gameStatus: GameStatus.game
+      gameStatus: GameStatus.game,
     });
 
     return {
       gameStateData: newGameState,
-      enemies: enemies,
-      bullets: bullets
+      enemies,
+      bullets,
     };
   }
 
@@ -53,7 +66,7 @@ export default function (
       els.flashEl.classList.remove('is-active');
     }
 
-    const {scoreEl, hiScoreEl} = els;
+    const { scoreEl, hiScoreEl } = els;
     const enemiesHit: number[] = [];
     const freeBulletId = getFreeBulletId(bullets, true);
     const freeEnemyId = getFreeEnemyId(enemies);
@@ -74,24 +87,24 @@ export default function (
         enemiesHit.push(enemy.id);
         updateScore(scoreEl, lastGameState.score);
         updateHiScore(hiScoreEl, lastGameState.score);
-      }
+      },
     });
 
-    bullets.forEach( bullet => {
+    bullets.forEach(bullet => {
       updateBullet(bullet, freeBulletId, lastXShipState.positionX, {
-        bulletEmittedCallback () {
+        bulletEmittedCallback() {
           blasterSound.seek(0).play();
         },
-        bulletReachedScreenEndCallback () {
+        bulletReachedScreenEndCallback() {
           resetScoreMultiplierAndCountScore(lastGameState, els);
-        }
+        },
       });
 
       detectBulletCollisionAgainstEnemies(bullet, enemies, {
         collisionCallback: enemy => {
           lastGameState.scoreChunk += enemy.score;
           enemiesHit.push(enemy.id);
-        }
+        },
       });
     });
 
@@ -103,6 +116,23 @@ export default function (
       });
 
       updateEnemy(enemy, freeEnemyId, {
+        destroyedCallback: () => {
+          explosionSound.seek(0).play();
+          lastGameState.scoreMultiplier += 1;
+
+          if (
+            lastGameState.scoreMultiplier > 1 &&
+            els.lastScoreEl &&
+            els.scoreMultiplierEl &&
+            els.bonusBarEl
+          ) {
+            els.bonusBarEl.classList.add('is-active');
+            els.lastScoreEl.textContent = String(lastGameState.scoreChunk);
+            els.scoreMultiplierEl.textContent = String(
+              lastGameState.scoreMultiplier
+            );
+          }
+        },
         gotPastScreenCallback: () => {
           lastGameState.lives = lastGameState.lives - 1;
 
@@ -118,21 +148,11 @@ export default function (
           updateHiScore(hiScoreEl, lastGameState.score);
           wooshSound.seek(0).play();
         },
-        destroyedCallback: () => {
-          explosionSound.seek(0).play();
-          lastGameState.scoreMultiplier += 1;
-
-          if (lastGameState.scoreMultiplier > 1 && els.lastScoreEl && els.scoreMultiplierEl && els.bonusBarEl) {
-            els.bonusBarEl.classList.add('is-active');
-            els.lastScoreEl.textContent = String(lastGameState.scoreChunk);
-            els.scoreMultiplierEl.textContent = String(lastGameState.scoreMultiplier);
-          }
-        }
       });
     });
 
     moveXShip(lastXShipState, isMoveLeft, isMoveRight, {
-      mouseX
+      mouseX,
     });
   }
 }

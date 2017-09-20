@@ -1,8 +1,8 @@
-import * as settings from './settings';
-import {clamp, random, range} from 'lodash';
-import {deg} from './utils';
+import { clamp, random, range } from 'lodash';
 import * as boundaries from './boundaries';
-import {timeUnit} from './gameLoop';
+import { timeUnit } from './gameLoop';
+import * as settings from './settings';
+import { deg } from './utils';
 
 const OFFSCREEN = 9999;
 const MIN_REBORN_TIME = 500;
@@ -10,7 +10,7 @@ const MAX_REBORN_TIME = 1000;
 const MIN_VELOCITY = 0.03;
 const MAX_VELOCITY = 0.05;
 
-export interface Enemy {
+export interface IEnemy {
   readonly id: number;
   readonly x: number;
   readonly y: number;
@@ -29,27 +29,25 @@ export interface Enemy {
   readonly score: number;
 }
 
-export function generateEnemies (maxNr: number) {
+export function generateEnemies(maxNr: number) {
   return range(maxNr).map(getDefaultEnemy);
 }
 
-export function getFreeEnemyId (enemies?: Enemy[]) {
+export function getFreeEnemyId(enemies?: IEnemy[]) {
   const NON_EXISTENT_ID = -1;
 
-  if (!enemies) { return NON_EXISTENT_ID; }
+  if (!enemies) {
+    return NON_EXISTENT_ID;
+  }
 
   const lastEnemy = enemies
-    .filter( enemy => enemy.isActive )
-    .sort( (enemyA, enemyB) => enemyB.emittedAt - enemyA.emittedAt)
-    [0];
+    .filter(enemy => enemy.isActive)
+    .sort((enemyA, enemyB) => enemyB.emittedAt - enemyA.emittedAt)[0];
 
-  if (
-    !lastEnemy ||
-    Date.now() - lastEnemy.emittedAt > lastEnemy.delay
-  ) {
+  if (!lastEnemy || Date.now() - lastEnemy.emittedAt > lastEnemy.delay) {
     const freeEnemy = enemies
-      .filter( enemy => !enemy.isUsed)
-      .find( enemy => !enemy.isActive);
+      .filter(enemy => !enemy.isUsed)
+      .find(enemy => !enemy.isActive);
 
     if (freeEnemy) {
       return freeEnemy.id;
@@ -59,19 +57,21 @@ export function getFreeEnemyId (enemies?: Enemy[]) {
   return NON_EXISTENT_ID;
 }
 
-export function rebornEnemies (enemies: Enemy[]) {
-    if ( enemies.every( enemy => enemy.isUsed ) ) {
-      enemies.forEach( enemy => Object.assign(enemy, {
-        isUsed: false
-      }) );
-    }
+export function rebornEnemies(enemies: IEnemy[]) {
+  if (enemies.every(enemy => enemy.isUsed)) {
+    enemies.forEach(enemy =>
+      Object.assign(enemy, {
+        isUsed: false,
+      })
+    );
+  }
 }
 
-function _checkIfEnemyVanished (enemy: Enemy) {
+function _checkIfEnemyVanished(enemy: IEnemy) {
   return enemy.isDestroyed && enemy.opacity === 0;
 }
 
-function _getNewEnemyOpacity (enemy: Enemy) {
+function _getNewEnemyOpacity(enemy: IEnemy) {
   if (enemy.energy <= 0) {
     const { opacity } = enemy;
 
@@ -87,8 +87,8 @@ function _getNewEnemyOpacity (enemy: Enemy) {
   return enemy.opacity;
 }
 
-function _getNewEnemySideforce(enemy: Enemy): number {
-  const {leftBoundary, rightBoundary} = boundaries;
+function _getNewEnemySideforce(enemy: IEnemy): number {
+  const { leftBoundary, rightBoundary } = boundaries;
 
   if (enemy.x <= leftBoundary || enemy.x >= rightBoundary) {
     return enemy.sideForce * -1;
@@ -97,27 +97,33 @@ function _getNewEnemySideforce(enemy: Enemy): number {
   return enemy.sideForce;
 }
 
-export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
-  top = settings.TOP,
-  bottom = settings.BOTTOM,
-  leftBoundary = boundaries.leftBoundary,
-  rightBoundary = boundaries.rightBoundary,
-  gotPastScreenCallback,
-  destroyedCallback
-}: {
-  top?: number,
-  bottom?: number,
-  leftBoundary?: number,
-  rightBoundary?: number,
-  gotPastScreenCallback?: (thisEnemy: Enemy) => void,
-  destroyedCallback?: (thisEnemy: Enemy) => void
-} = {}) {
+export function updateEnemy(
+  enemy: IEnemy,
+  freeEnemyId: number,
+  {
+    top = settings.TOP,
+    bottom = settings.BOTTOM,
+    leftBoundary = boundaries.leftBoundary,
+    rightBoundary = boundaries.rightBoundary,
+    gotPastScreenCallback,
+    destroyedCallback,
+  }: {
+    top?: number;
+    bottom?: number;
+    leftBoundary?: number;
+    rightBoundary?: number;
+    gotPastScreenCallback?: (thisEnemy: IEnemy) => void;
+    destroyedCallback?: (thisEnemy: IEnemy) => void;
+  } = {}
+) {
   if (enemy.y < bottom) {
-    if (gotPastScreenCallback) { gotPastScreenCallback(enemy); }
+    if (gotPastScreenCallback) {
+      gotPastScreenCallback(enemy);
+    }
     return rebuildEnemy(enemy);
   }
 
-  if ( _checkIfEnemyVanished(enemy) ) {
+  if (_checkIfEnemyVanished(enemy)) {
     return rebuildEnemy(enemy);
   }
 
@@ -126,7 +132,7 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
       x: random(leftBoundary, rightBoundary, true),
       y: top,
       isActive: true,
-      emittedAt: Date.now()
+      emittedAt: Date.now(),
     });
   }
 
@@ -135,22 +141,28 @@ export function updateEnemy (enemy: Enemy, freeEnemyId: number, {
   }
 
   return Object.assign(enemy, {
-    x: clamp(enemy.x + _getNewEnemySideforce(enemy) * timeUnit, leftBoundary, rightBoundary),
+    x: clamp(
+      enemy.x + _getNewEnemySideforce(enemy) * timeUnit,
+      leftBoundary,
+      rightBoundary
+    ),
     y: enemy.y - enemy.velocity * timeUnit,
-    rotation: enemy.rotation + deg(_getNewEnemySideforce(enemy) * 10 * timeUnit),
+    rotation:
+      enemy.rotation + deg(_getNewEnemySideforce(enemy) * 10 * timeUnit),
     isDestroyed: enemy.energy <= 0,
     opacity: _getNewEnemyOpacity(enemy),
-    sideForce: _getNewEnemySideforce(enemy)
+    sideForce: _getNewEnemySideforce(enemy),
   });
 }
 
-export function handleEnemyCollision (
-  enemy: Enemy, enemiesHit: number[],
-  hitCallback?: (thisEnemy: Enemy) => void
+export function handleEnemyCollision(
+  enemy: IEnemy,
+  enemiesHit: number[],
+  hitCallback?: (thisEnemy: IEnemy) => void
 ) {
   let { energy } = enemy;
 
-  if ( enemiesHit.some( enemyId => enemyId === enemy.id) ) {
+  if (enemiesHit.some(enemyId => enemyId === enemy.id)) {
     energy -= 1;
 
     if (hitCallback) {
@@ -161,10 +173,10 @@ export function handleEnemyCollision (
   return Object.assign(enemy, { energy });
 }
 
-export function rebuildEnemy (enemy: Enemy): Enemy {
+export function rebuildEnemy(enemy: IEnemy): IEnemy {
   const minDelay = Math.max(MIN_REBORN_TIME - enemy.level * 10, 300);
   const maxDelay = Math.max(MAX_REBORN_TIME - enemy.level * 10, 500);
-  const maxVelocity = Math.min(MAX_VELOCITY + (enemy.level * 2) / 100, 0.1);
+  const maxVelocity = Math.min(MAX_VELOCITY + enemy.level * 2 / 100, 0.1);
   const energy = random(1, 100) > 80 ? Math.min(enemy.level + 1, 3) : 1;
   const velocity = _getVelocity(energy, maxVelocity, enemy.level);
   const sideForce = energy > 1 ? 0 : random(-0.1, 0.1, true);
@@ -186,14 +198,16 @@ export function rebuildEnemy (enemy: Enemy): Enemy {
     delay: random(minDelay, maxDelay),
     initialEnergy: energy,
     energy,
-    score: _calculateScore ({
-      velocity, sideForce, level,
-      initialEnergy: energy
-    })
+    score: _calculateScore({
+      velocity,
+      sideForce,
+      level,
+      initialEnergy: energy,
+    }),
   });
 }
 
-export function getDefaultEnemy (id: number): Enemy {
+export function getDefaultEnemy(id: number): IEnemy {
   const DEFAULT_ENERGY = 1;
   const DEFAULT_LEVEL = 1;
   const DEFAULT_SIDE_FORCE = 0;
@@ -218,12 +232,12 @@ export function getDefaultEnemy (id: number): Enemy {
       velocity,
       initialEnergy: DEFAULT_ENERGY,
       sideForce: DEFAULT_SIDE_FORCE,
-      level: DEFAULT_LEVEL
-    })
+      level: DEFAULT_LEVEL,
+    }),
   };
 }
 
-function _getVelocity (energy: number, maxVelocity: number, level: number) {
+function _getVelocity(energy: number, maxVelocity: number, level: number) {
   switch (energy) {
     case 1:
       return random(MIN_VELOCITY + level / 40, maxVelocity, true);
@@ -236,16 +250,24 @@ function _getVelocity (energy: number, maxVelocity: number, level: number) {
   }
 }
 
-function _calculateScore (
-  { velocity, sideForce, level, initialEnergy }: {
-    velocity: number,
-    sideForce: number,
-    level: number,
-    initialEnergy: number
-  }
-) {
+function _calculateScore({
+  velocity,
+  sideForce,
+  level,
+  initialEnergy,
+}: {
+  velocity: number;
+  sideForce: number;
+  level: number;
+  initialEnergy: number;
+}) {
   const velocityScore = velocity || 0.01;
   const sideForceScore = sideForce || 0.01;
 
-  return Math.ceil(level + Math.pow(velocityScore, 3) * 100 + Math.pow(sideForceScore, 3) * 1000 + initialEnergy);
+  return Math.ceil(
+    level +
+      Math.pow(velocityScore, 3) * 100 +
+      Math.pow(sideForceScore, 3) * 1000 +
+      initialEnergy
+  );
 }

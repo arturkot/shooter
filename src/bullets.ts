@@ -1,49 +1,46 @@
+import { range } from 'lodash';
+import { circlePointCollision } from './collisionDetection';
+import { IEnemy } from './enemies';
+import { timeUnit } from './gameLoop';
 import * as settings from './settings';
-import {range} from 'lodash';
-import {Enemy} from './enemies';
-import {circlePointCollision} from './collisionDetection';
-import {timeUnit} from './gameLoop';
 
-export interface Bullet {
+export interface IBullet {
+  emittedAt?: number;
+  height: number;
   id: number;
+  isActive: boolean;
   x: number;
   y: number;
-  height: number;
-  isActive: boolean;
-  emittedAt?: number;
 }
 
-export function generateBullets (maxNr: number) {
+export function generateBullets(maxNr: number) {
   const OFFSCREEN = 9999;
   const array = range(maxNr);
 
-  return array.map( number => ({
-      id: number,
-      x: OFFSCREEN,
-      y: OFFSCREEN,
-      height: 0.6,
-      isActive: false,
-      emittedAt: undefined
-    })
-  );
+  return array.map(index => ({
+    emittedAt: undefined,
+    height: 0.6,
+    id: index,
+    isActive: false,
+    x: OFFSCREEN,
+    y: OFFSCREEN,
+  }));
 }
 
-export function getFreeBulletId (bullets: Bullet[], isShoot: boolean) {
+export function getFreeBulletId(bullets: IBullet[], isShoot: boolean) {
   const NON_EXISTENT_ID = -1;
 
-  if (!isShoot) { return NON_EXISTENT_ID; }
+  if (!isShoot) {
+    return NON_EXISTENT_ID;
+  }
 
   const MIN_DELAY = 400;
   const lastBullet = bullets
-    .filter( bullet => bullet.isActive )
-    .sort( (bulletA, bulletB) => bulletB.emittedAt - bulletA.emittedAt)
-    [0];
+    .filter(bullet => bullet.isActive)
+    .sort((bulletA, bulletB) => bulletB.emittedAt - bulletA.emittedAt)[0];
 
-  if (
-    !lastBullet ||
-    Date.now() - lastBullet.emittedAt > MIN_DELAY
-  ) {
-    const freeBullet = bullets.find( bullet => !bullet.isActive );
+  if (!lastBullet || Date.now() - lastBullet.emittedAt > MIN_DELAY) {
+    const freeBullet = bullets.find(bullet => !bullet.isActive);
 
     if (freeBullet) {
       return freeBullet.id;
@@ -53,28 +50,32 @@ export function getFreeBulletId (bullets: Bullet[], isShoot: boolean) {
   return NON_EXISTENT_ID;
 }
 
-export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
-  defaultY = settings.XSHIP_Y,
-  bulletSpeed = settings.BULLET_SPEED,
-  maxBulletsOnScreen = settings.MAX_BULLETS_ON_SCREEN,
-  bulletEmittedCallback, bulletReachedScreenEndCallback
-}: {
-  defaultY?: number;
-  bulletSpeed?: number;
-  maxBulletsOnScreen?: number;
-  bulletEmittedCallback?: (thisBullet: Bullet) => void;
-  bulletReachedScreenEndCallback?: (thisBullet: Bullet) => void;
-} = {}) {
+export function updateBullet(
+  bullet: IBullet,
+  freeBulletId: number,
+  x: number,
+  {
+    defaultY = settings.XSHIP_Y,
+    bulletSpeed = settings.BULLET_SPEED,
+    maxBulletsOnScreen = settings.MAX_BULLETS_ON_SCREEN,
+    bulletEmittedCallback,
+    bulletReachedScreenEndCallback,
+  }: {
+    defaultY?: number;
+    bulletSpeed?: number;
+    maxBulletsOnScreen?: number;
+    bulletEmittedCallback?: (thisBullet: IBullet) => void;
+    bulletReachedScreenEndCallback?: (thisBullet: IBullet) => void;
+  } = {}
+) {
   const updatedBullet = {
+    emittedAt: bullet.emittedAt,
+    isActive: bullet.isActive,
     x: bullet.x,
     y: bullet.y,
-    isActive: bullet.isActive,
-    emittedAt: bullet.emittedAt
   };
 
-  if (
-    bullet.isActive &&
-    bullet.y > bullet.height * maxBulletsOnScreen) {
+  if (bullet.isActive && bullet.y > bullet.height * maxBulletsOnScreen) {
     updatedBullet.isActive = false;
 
     if (bulletReachedScreenEndCallback) {
@@ -100,20 +101,24 @@ export function updateBullet (bullet: Bullet, freeBulletId: number, x: number, {
   return Object.assign(bullet, updatedBullet);
 }
 
-export function detectBulletCollisionAgainstEnemies (bullet: Bullet, enemies: Enemy[], {
-  collisionCallback
-}: {
-  collisionCallback?: (enemy: Enemy) => void
-} = {}) {
+export function detectBulletCollisionAgainstEnemies(
+  bullet: IBullet,
+  enemies: IEnemy[],
+  {
+    collisionCallback,
+  }: {
+    collisionCallback?: (enemy: IEnemy) => void;
+  } = {}
+) {
   if (!bullet.isActive) {
     return;
   }
 
   enemies.forEach(enemy => {
     const enemyRange = {
+      radius: 0.8,
       x: enemy.x,
       y: enemy.y,
-      radius: 0.8
     };
 
     if (

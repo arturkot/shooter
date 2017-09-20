@@ -9,7 +9,7 @@ const ARROW_RIGHT = 39;
 
 addEvents();
 
-function addEvents () {
+function addEvents() {
   window.addEventListener('keydown', handleKeydown, false);
   window.addEventListener('keyup', handleKeyup, false);
 
@@ -19,7 +19,7 @@ function addEvents () {
   document.addEventListener('touchend', handleTouchEnd, false);
 }
 
-function removeEvents () {
+function removeEvents() {
   window.removeEventListener('keydown', handleKeydown, false);
   window.removeEventListener('keyup', handleKeyup, false);
 
@@ -29,8 +29,7 @@ function removeEvents () {
   document.removeEventListener('touchend', handleTouchEnd, false);
 }
 
-
-export function resetUserEvents (time: number = 1000) {
+export function resetUserEvents(time: number = 1000) {
   isMoveLeft = false;
   isMoveRight = false;
   isShoot = false;
@@ -41,26 +40,26 @@ export function resetUserEvents (time: number = 1000) {
   }
 }
 
-function handleMouseMove (event: MouseEvent) {
+function handleMouseMove(event: MouseEvent) {
   updateMouseX(event.x);
 }
 
-function handleTouchMove (event: TouchEvent) {
+function handleTouchMove(event: TouchEvent) {
   const touch = event.touches[0];
   const x = touch.clientX;
 
   updateMouseX(x);
 }
 
-function handleTouchStart () {
+function handleTouchStart() {
   isShoot = true;
 }
 
-function handleTouchEnd () {
+function handleTouchEnd() {
   isShoot = false;
 }
 
-function updateMouseX (x: number) {
+function updateMouseX(x: number) {
   const boundryWidth = window.innerWidth / 2 - window.innerHeight * 9 / 16 / 2;
   let xPos = 0;
 
@@ -75,7 +74,7 @@ function updateMouseX (x: number) {
   mouseX = (xPos - boundryWidth) / (window.innerWidth - boundryWidth * 2);
 }
 
-function handleKeydown (event: KeyboardEvent) {
+function handleKeydown(event: KeyboardEvent) {
   const { keyCode } = event;
 
   switch (keyCode) {
@@ -87,10 +86,13 @@ function handleKeydown (event: KeyboardEvent) {
       break;
     case SPACE:
       isShoot = true;
+      break;
+    default:
+      break;
   }
 }
 
-function handleKeyup (event: KeyboardEvent) {
+function handleKeyup(event: KeyboardEvent) {
   const { keyCode } = event;
 
   switch (keyCode) {
@@ -102,5 +104,8 @@ function handleKeyup (event: KeyboardEvent) {
       break;
     case SPACE:
       isShoot = false;
+      break;
+    default:
+      break;
   }
 }

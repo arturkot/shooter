@@ -1,14 +1,17 @@
-import { isShoot, resetUserEvents } from "./userEvents";
-import {Els, GameStateData} from './main';
+import { IEnemy } from './enemies';
+import {
+  resetEnemiesAppearanceInScene,
+  updateEnemyInScene,
+} from './gameLayer/enemies';
 import { GameStatus } from './gameState';
-import { updateScore } from "./score";
-import {Enemy} from "./enemies";
-import {resetEnemiesAppearanceInScene, updateEnemyInScene} from "./gameLayer/enemies";
+import { IEls, IGameStateData } from './main';
+import { updateScore } from './score';
+import { isShoot, resetUserEvents } from './userEvents';
 
-export default function (
-  lastGameState: GameStateData,
-  enemies: Enemy[],
-  els: Els
+export default function(
+  lastGameState: IGameStateData,
+  enemies: IEnemy[],
+  els: IEls
 ) {
   const { gameOverEl, scoreEl } = els;
 
@@ -28,5 +31,5 @@ export default function (
   updateScore(scoreEl, lastGameState.score);
   resetEnemiesAppearanceInScene(enemies);
 
-  enemies.forEach( enemy => updateEnemyInScene(enemy) );
+  enemies.forEach(enemy => updateEnemyInScene(enemy));
 }

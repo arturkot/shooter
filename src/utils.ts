@@ -1,3 +1,3 @@
-export function deg (degrees: number) {
+export function deg(degrees: number) {
   return degrees * Math.PI / 180;
 }

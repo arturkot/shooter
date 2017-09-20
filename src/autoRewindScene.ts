@@ -1,23 +1,23 @@
-import {clockGet, clockReset} from './clock';
-import {GameState, GameStatus} from './gameState';
-import {Els, GameStateData, XShipStateData} from './main';
-import {Enemy} from './enemies';
-import {Bullet} from './bullets';
-import {moveXShip} from './xShip';
-import {isMoveLeft, isMoveRight, mouseX} from './userEvents';
+import { IBullet } from './bullets';
+import { clockGet, clockReset } from './clock';
+import { IEnemy } from './enemies';
+import { GameState, GameStatus } from './gameState';
+import { IEls, IGameStateData, IXShipStateData } from './main';
+import { isMoveLeft, isMoveRight, mouseX } from './userEvents';
+import { moveXShip } from './xShip';
 
-export default function (
-  bulletsState: GameState<Bullet[]>,
-  prevBulletsStates: GameState<Bullet[]>,
-  enemiesState: GameState<Enemy[]>,
-  prevEnemiesStates: GameState<Enemy[]>,
-  gameStatesCache: GameState<GameStateData>,
-  prevGameStates: GameState<GameStateData>,
-  gameState: GameState<GameStateData>,
-  lastGameState: GameStateData,
-  prevGameState: GameStateData,
-  els: Els,
-  lastXShipState: XShipStateData,
+export default function(
+  bulletsState: GameState<IBullet[]>,
+  prevBulletsStates: GameState<IBullet[]>,
+  enemiesState: GameState<IEnemy[]>,
+  prevEnemiesStates: GameState<IEnemy[]>,
+  gameStatesCache: GameState<IGameStateData>,
+  prevGameStates: GameState<IGameStateData>,
+  gameState: GameState<IGameStateData>,
+  lastGameState: IGameStateData,
+  prevGameState: IGameStateData,
+  els: IEls,
+  lastXShipState: IXShipStateData
 ) {
   if (prevGameState.gameStatus !== lastGameState.gameStatus) {
     clockReset();
@@ -27,7 +27,7 @@ export default function (
     }
 
     const gameStateData = Object.assign(lastGameState, {
-      gameStatus: GameStatus.autoRewind
+      gameStatus: GameStatus.autoRewind,
     });
 
     gameStatesCache.add(gameStateData);
@@ -36,7 +36,7 @@ export default function (
   }
 
   if (clockGet() > 0.5) {
-    const prevEnemies = prevEnemiesStates.use() as Enemy[];
+    const prevEnemies = prevEnemiesStates.use() as IEnemy[];
     const prevState = prevGameStates.use();
     const prevBulletsState = prevBulletsStates.use();
 
@@ -54,19 +54,18 @@ export default function (
       }
 
       moveXShip(lastXShipState, isMoveLeft, isMoveRight, {
-        mouseX
+        mouseX,
       });
     } else {
       const gameStateData = Object.assign(prevGameStates.get(), {
+        gameStatus: GameStatus.game,
         lives: lastGameState.lives,
-        gameStatus: GameStatus.game
-      }) as GameStateData;
-
+      }) as IGameStateData;
 
       gameState.add(gameStateData);
       gameStatesCache.add(gameStateData);
-      bulletsState.add( prevBulletsStates.get() as Bullet[] );
-      enemiesState.add( prevEnemiesStates.get() as Enemy[] );
+      bulletsState.add(prevBulletsStates.get() as IBullet[]);
+      enemiesState.add(prevEnemiesStates.get() as IEnemy[]);
     }
   }
 }

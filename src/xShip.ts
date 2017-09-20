@@ -1,12 +1,12 @@
-import { Enemy } from './enemies';
-import { deg } from './utils';
-import { rectIntersect } from './collisionDetection';
 import * as boundaries from './boundaries';
 import { gameWidth } from './boundaries';
-import {XShipStateData} from './main';
+import { rectIntersect } from './collisionDetection';
+import { IEnemy } from './enemies';
+import { IXShipStateData } from './main';
+import { deg } from './utils';
 
 export function moveXShip(
-  xShipState: XShipStateData,
+  xShipState: IXShipStateData,
   isMoveLeft = false,
   isMoveRight = false,
   {
@@ -26,7 +26,9 @@ export function moveXShip(
     xShipState.positionX = gameWidth * mouseX - gameWidth / 2;
   } else if (isMoveLeft) {
     xShipState.positionX =
-      xShipState.positionX <= leftBoundary ? leftBoundary : xShipState.positionX - 0.2;
+      xShipState.positionX <= leftBoundary
+        ? leftBoundary
+        : xShipState.positionX - 0.2;
 
     xShipState.rotationY =
       xShipState.rotationY <= deg(-MAX_ROTATION)
@@ -51,7 +53,7 @@ export function moveXShip(
   }
 }
 
-export function destroyXShip(xShipState: XShipStateData) {
+export function destroyXShip(xShipState: IXShipStateData) {
   if (xShipState.opacity >= 0) {
     xShipState.rotationY += 0.1;
     xShipState.scaleX -= 0.01;
@@ -63,41 +65,40 @@ export function destroyXShip(xShipState: XShipStateData) {
 }
 
 export function detectEnemyCollisionAgainstXShip(
-  xShipState: XShipStateData,
-  enemies: Enemy[],
+  xShipState: IXShipStateData,
+  enemies: IEnemy[],
   {
     collisionCallback,
   }: {
-    collisionCallback?: (enemy: Enemy) => void;
+    collisionCallback?: (enemy: IEnemy) => void;
   } = {}
 ) {
-  enemies
-    .forEach(enemy => {
-      const enemyBox = {
-        min: {
-          x: enemy.x - 0.5,
-          y: enemy.y - 0.5
-        },
-        max: {
-          x: enemy.x + 0.5,
-          y: enemy.y + 0.5
-        }
-      };
-      const xShipBox = {
-        min: {
-          x: xShipState.positionX - 0.5,
-          y: xShipState.positionY - 0.5
-        },
-        max: {
-          x: xShipState.positionX + 0.5,
-          y: xShipState.positionY + 0.5
-        }
-      };
+  enemies.forEach(enemy => {
+    const enemyBox = {
+      min: {
+        x: enemy.x - 0.5,
+        y: enemy.y - 0.5,
+      },
+      max: {
+        x: enemy.x + 0.5,
+        y: enemy.y + 0.5,
+      },
+    };
+    const xShipBox = {
+      min: {
+        x: xShipState.positionX - 0.5,
+        y: xShipState.positionY - 0.5,
+      },
+      max: {
+        x: xShipState.positionX + 0.5,
+        y: xShipState.positionY + 0.5,
+      },
+    };
 
-      if (rectIntersect(enemyBox, xShipBox)) {
-        if (collisionCallback) {
-          collisionCallback(enemy);
-        }
+    if (rectIntersect(enemyBox, xShipBox)) {
+      if (collisionCallback) {
+        collisionCallback(enemy);
       }
-    });
+    }
+  });
 }

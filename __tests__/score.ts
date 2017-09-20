@@ -1,4 +1,4 @@
-import { updateScore, updateHiScore } from '../src/score';
+import { updateHiScore, updateScore } from '../src/score';
 
 it(`allows to set 0`, () => {
   const scoreEl = document.createElement('div');

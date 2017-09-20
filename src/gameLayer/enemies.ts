@@ -1,27 +1,27 @@
-import {scene} from './setup';
-import {deg} from '../utils';
-import {Enemy} from '../enemies';
-import {random} from 'lodash';
+import { random } from 'lodash';
+import { IEnemy } from '../enemies';
+import { deg } from '../utils';
+import { scene } from './setup';
 
 export const enemyElements: THREE.Mesh[] = [];
 
-export function addEnemies(initialEnemies: Enemy[], xTriangle: THREE.Geometry) {
+export function addEnemies(initialEnemies: IEnemy[], xTriangle: THREE.Geometry) {
   const OFFSCREEN = 9999;
 
   initialEnemies.forEach(() => {
     const geometry = new THREE.BoxGeometry(1, 1, 1);
     const material = new THREE.MeshBasicMaterial({
       opacity: 0,
+      side: THREE.BackSide,
       transparent: true,
-      side: THREE.BackSide
     });
     const xTriangleMaterial = new THREE.MeshPhongMaterial({
-      color: 0x78A5EC,
-      specular: 0xffffff,
+      color: 0x78a5ec,
+      opacity: 1,
       shading: THREE.FlatShading,
       side: THREE.BackSide,
-      opacity: 1,
-      transparent: true
+      specular: 0xffffff,
+      transparent: true,
     });
     const triangleA = new THREE.Mesh(xTriangle, xTriangleMaterial);
     const triangleB = new THREE.Mesh(xTriangle, xTriangleMaterial);
@@ -46,7 +46,7 @@ export function addEnemies(initialEnemies: Enemy[], xTriangle: THREE.Geometry) {
   });
 }
 
-export function updateEnemyInScene(enemy: Enemy) {
+export function updateEnemyInScene(enemy: IEnemy) {
   const OFFSCREEN = 9999;
   const element = enemyElements[enemy.id];
 
@@ -75,7 +75,7 @@ export function updateEnemyInScene(enemy: Enemy) {
   }
 }
 
-export function resetEnemiesAppearanceInScene(enemies: Enemy[]) {
+export function resetEnemiesAppearanceInScene(enemies: IEnemy[]) {
   enemies.forEach(enemy => {
     const element = enemyElements[enemy.id];
 
@@ -84,45 +84,45 @@ export function resetEnemiesAppearanceInScene(enemies: Enemy[]) {
     }
 
     const material = element.material as THREE.MeshBasicMaterial;
-    material.color.setHex(0x2C88D8);
+    material.color.setHex(0x2c88d8);
   });
 }
 
-function _updateColors (element: THREE.Mesh, enemy: Enemy) {
+function _updateColors(element: THREE.Mesh, enemy: IEnemy) {
   const { energy, velocity } = enemy;
 
   if (velocity > 0.1) {
-    _updateChildrenColor(element, 0xDB3AD0);
+    _updateChildrenColor(element, 0xdb3ad0);
   } else {
-    _updateChildrenColor(element, 0x78A5EC);
+    _updateChildrenColor(element, 0x78a5ec);
   }
 
   if (enemy.isDestroyed) {
-    _updateChildrenColor(element, 0xFF0000);
+    _updateChildrenColor(element, 0xff0000);
   }
 
   switch (energy) {
     case 3:
-      _updateChildrenEmissive(element, 0xB7BBC0);
+      _updateChildrenEmissive(element, 0xb7bbc0);
       break;
     case 2:
-      _updateChildrenEmissive(element, 0x73ADCF);
+      _updateChildrenEmissive(element, 0x73adcf);
       break;
     default:
       _updateChildrenEmissive(element, 0x000000);
   }
 }
 
-function _updateChildrenColor (element: THREE.Mesh, color: number) {
-  element.children.forEach( (child: THREE.Mesh) => {
+function _updateChildrenColor(element: THREE.Mesh, color: number) {
+  element.children.forEach((child: THREE.Mesh) => {
     const material = child.material as THREE.MeshPhongMaterial;
     material.color.setHex(color);
-  } );
+  });
 }
 
-function _updateChildrenEmissive (element: THREE.Mesh, color: number) {
-  element.children.forEach( (child: THREE.Mesh) => {
+function _updateChildrenEmissive(element: THREE.Mesh, color: number) {
+  element.children.forEach((child: THREE.Mesh) => {
     const material = child.material as THREE.MeshPhongMaterial;
     material.emissive.setHex(color);
-  } );
+  });
 }

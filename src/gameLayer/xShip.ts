@@ -1,7 +1,7 @@
-import {scene} from './setup';
-import {XShipStateData} from '../main';
-import {deg} from '../utils';
-import {random} from 'lodash';
+import { random } from 'lodash';
+import { IXShipStateData } from '../main';
+import { deg } from '../utils';
+import { scene } from './setup';
 
 export let xShip: THREE.Mesh;
 export let xShipCollisionElement: THREE.Mesh;
@@ -9,7 +9,7 @@ export let exhaustAElement: THREE.Mesh;
 export let exhaustBElement: THREE.Mesh;
 export let exhaustCElement: THREE.Mesh;
 
-export function updateXShip(xShipState: XShipStateData) {
+export function updateXShip(xShipState: IXShipStateData) {
   xShip.position.x = xShipState.positionX;
   xShip.position.y = xShipState.positionY;
   xShip.rotation.y = xShipState.rotationY;
@@ -47,10 +47,10 @@ export function addXShip({
   const collisionGeometry = new THREE.BoxGeometry(0.5, 0.001, 0.1);
   const parentGeometry = new THREE.BoxGeometry(0.1, 0.1, 0.1);
   const parentMaterial = new THREE.MeshBasicMaterial({
-    opacity: 0,
     color: 0xff0000,
-    transparent: true,
+    opacity: 0,
     side: THREE.BackSide,
+    transparent: true,
   });
   const exhaustAGeometry = new THREE.ConeGeometry(0.2, -1, 8);
   const exhaustBGeometry = new THREE.ConeGeometry(0.1, -0.3, 8);
@@ -112,12 +112,12 @@ export function addXShip({
   xShipCollisionElement = collision;
 }
 
-function _getXCloud (xShipCloud: THREE.Geometry) {
+function _getXCloud(xShipCloud: THREE.Geometry) {
   const material = new THREE.MeshPhongMaterial({
-    color: 0xEC4D2E,
-    specular: 0xEE6760,
+    color: 0xec4d2e,
     side: THREE.BackSide,
-    transparent: true
+    specular: 0xee6760,
+    transparent: true,
   });
   const element = new THREE.Mesh(xShipCloud, material);
 
@@ -125,11 +125,11 @@ function _getXCloud (xShipCloud: THREE.Geometry) {
   return element;
 }
 
-function _getXPart (xChunk: THREE.Geometry) {
+function _getXPart(xChunk: THREE.Geometry) {
   const material = new THREE.MeshPhongMaterial({
     color: 0xffffff,
     side: THREE.BackSide,
-    transparent: true
+    transparent: true,
   });
   const element = new THREE.Mesh(xChunk, material);
 
@@ -137,10 +137,10 @@ function _getXPart (xChunk: THREE.Geometry) {
   return element;
 }
 
-function _getXBody (xBody: THREE.Geometry) {
+function _getXBody(xBody: THREE.Geometry) {
   const material = new THREE.MeshPhongMaterial({
     color: 0xffffff,
-    transparent: true
+    transparent: true,
   });
   const element = new THREE.Mesh(xBody, material);
 
@@ -148,10 +148,10 @@ function _getXBody (xBody: THREE.Geometry) {
   return element;
 }
 
-function _getXRear (zRear: THREE.Geometry) {
+function _getXRear(zRear: THREE.Geometry) {
   const material = new THREE.MeshBasicMaterial({
-    color: 0x0EFFFF,
-    transparent: true
+    color: 0x0effff,
+    transparent: true,
   });
   const element = new THREE.Mesh(zRear, material);
 

@@ -1,17 +1,17 @@
-import { GameStateData, XShipStateData } from '../main';
-import {GameStatus} from '../gameState';
-import { updateXShip } from './xShip';
+import { IBullet } from '../bullets';
+import { IEnemy } from '../enemies';
+import { GameStatus } from '../gameState';
+import { IGameStateData, IXShipStateData } from '../main';
+import { updateBullet } from './bullets';
+import { updateEnemyInScene } from './enemies';
 import { animateSphereBg } from './sphereBg';
-import {updateBullet} from './bullets';
-import {Bullet} from '../bullets';
-import {updateEnemyInScene} from './enemies';
-import {Enemy} from '../enemies';
+import { updateXShip } from './xShip';
 
 export function updateRender(
-  gameState: GameStateData,
-  xShip: XShipStateData,
-  bullets: Bullet[],
-  enemies: Enemy[]
+  gameState: IGameStateData,
+  xShip: IXShipStateData,
+  bullets: IBullet[],
+  enemies: IEnemy[]
 ) {
   if (
     gameState.gameStatus === GameStatus.autoRewind ||
