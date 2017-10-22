@@ -1,4 +1,3 @@
-import * as boundaries from './boundaries';
 import { gameWidth } from './boundaries';
 import { rectIntersect } from './collisionDetection';
 import { IEnemy } from './enemies';
@@ -10,36 +9,24 @@ export function moveXShip(
   isMoveLeft = false,
   isMoveRight = false,
   {
-    leftBoundary = boundaries.leftBoundary,
-    rightBoundary = boundaries.rightBoundary,
     mouseX,
   }: {
-    leftBoundary?: number;
-    rightBoundary?: number;
     mouseX?: number;
   } = {}
 ) {
-  const MAX_ROTATION = 45;
-  const ROTATION_SPEED = 1.4;
+  const MAX_ROTATION = 20;
+  const ROTATION_SPEED = 5;
 
   if (mouseX) {
     xShipState.positionX = gameWidth * mouseX - gameWidth / 2;
-  } else if (isMoveLeft) {
-    xShipState.positionX =
-      xShipState.positionX <= leftBoundary
-        ? leftBoundary
-        : xShipState.positionX - 0.2;
+  }
 
+  if (isMoveLeft) {
     xShipState.rotationY =
       xShipState.rotationY <= deg(-MAX_ROTATION)
         ? deg(-MAX_ROTATION)
         : xShipState.rotationY - deg(ROTATION_SPEED);
   } else if (isMoveRight) {
-    xShipState.positionX =
-      xShipState.positionX >= rightBoundary
-        ? rightBoundary
-        : xShipState.positionX + 0.2;
-
     xShipState.rotationY =
       xShipState.rotationY >= deg(MAX_ROTATION)
         ? deg(MAX_ROTATION)

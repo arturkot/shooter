@@ -63,23 +63,12 @@ parsedResults.then(assets => {
     bonusBarEl: document.querySelector('.js-bonus-bar'),
   };
 
-  const {
-    xShipCloud,
-    xShipBody,
-    xShipRear,
-    xTriangle,
-    xChunk,
-    sphereBgGeo,
-  } = assets;
+  const { xShip: xShipGeo, xTriangle, sphereBgGeo } = assets;
   const initialBullets = generateBullets(MAX_BULLETS);
   const initialEnemies = generateEnemies(ENEMIES_WAVE);
 
   addXShip({
-    xShipCloud,
-    xShipBody,
-    xShipRear,
-    xTriangle,
-    xChunk,
+    xShipGeo,
     shipPositionY: XSHIP_Y,
   });
   addSphereBg(sphereBgGeo);
@@ -97,9 +86,9 @@ parsedResults.then(assets => {
     positionX: 0,
     positionY: XSHIP_Y,
     rotationY: 0,
-    scaleX: 1,
-    scaleY: 1,
-    scaleZ: 1,
+    scaleX: 0.3,
+    scaleY: 0.3,
+    scaleZ: 0.06,
     opacity: 1,
   };
   const xShipState = new GameState(1, initialXShipState);
