@@ -5,7 +5,6 @@
   },
   "globalDependencies": {
     "jest": "registry:dt/jest#18.1.0+20170131225342",
-    "stats.js": "registry:dt/stats.js#0.16.0+20161123230554",
-    "three": "registry:dt/three#0.0.0+20161228004308"
+    "stats.js": "registry:dt/stats.js#0.16.0+20161123230554"
   }
 }

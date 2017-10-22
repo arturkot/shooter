@@ -6,6 +6,16 @@
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/@types/howler/-/howler-2.0.0.tgz#f8d11e081297b4c289e99d24159cd207e26e746c"
 
+"@types/three@^0.84.27":
+  version "0.84.27"
+  resolved "https://registry.yarnpkg.com/@types/three/-/three-0.84.27.tgz#d699ad96dfe9f0278b8966825ff7a8b460032dff"
+  dependencies:
+    "@types/webvr-api" "*"
+
+"@types/webvr-api@*":
+  version "0.0.31"
+  resolved "https://registry.yarnpkg.com/@types/webvr-api/-/webvr-api-0.0.31.tgz#f6061fe88a035d34a8b6a0c55f8758901ec8a08e"
+
 Base64@~0.2.0:
   version "0.2.1"
   resolved "https://registry.yarnpkg.com/Base64/-/Base64-0.2.1.tgz#ba3a4230708e186705065e66babdd4c35cf60028"
