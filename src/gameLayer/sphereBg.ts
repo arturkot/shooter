@@ -1,6 +1,6 @@
 import { timeUnit } from '../gameLoop';
 import { deg } from '../utils';
-import { scene } from './setup';
+// import { scene } from './setup';
 
 type Direction = 'back' | 'forward';
 
@@ -33,7 +33,7 @@ export function addSphereBg(geometry: THREE.Geometry) {
 
   sphereBg.rotation.z = deg(90);
 
-  scene.add(sphereBg);
+  // scene.add(sphereBg);
 
   return sphereBg;
 }
