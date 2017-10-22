@@ -59,6 +59,7 @@ function handleTouchEnd() {
   isShoot = false;
 }
 
+let prevXpos = 0;
 function updateMouseX(x: number) {
   const boundryWidth = window.innerWidth / 2 - window.innerHeight * 9 / 16 / 2;
   let xPos = 0;
@@ -72,6 +73,23 @@ function updateMouseX(x: number) {
   }
 
   mouseX = (xPos - boundryWidth) / (window.innerWidth - boundryWidth * 2);
+
+  if (mouseX < prevXpos) {
+    isMoveLeft = true;
+    isMoveRight = false;
+  }
+
+  if (mouseX > prevXpos) {
+    isMoveLeft = false;
+    isMoveRight = true;
+  }
+
+  if (mouseX === prevXpos) {
+    isMoveLeft = false;
+    isMoveRight = false;
+  }
+
+  prevXpos = mouseX;
 }
 
 function handleKeydown(event: KeyboardEvent) {
