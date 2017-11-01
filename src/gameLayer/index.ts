@@ -4,7 +4,6 @@ import { GameStatus } from '../gameState';
 import { IGameStateData, IXShipStateData } from '../main';
 import { updateBullet } from './bullets';
 import { updateEnemyInScene } from './enemies';
-import { animateSphereBg } from './sphereBg';
 import { updateXShip } from './xShip';
 
 export function updateRender(
@@ -30,11 +29,6 @@ export function updateRender(
   }
 
   if (gameState.gameStatus === GameStatus.autoRewind) {
-    animateSphereBg('back');
     bullets.forEach(updateBullet);
-  }
-
-  if (gameState.gameStatus === GameStatus.game) {
-    animateSphereBg();
   }
 }

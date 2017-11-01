@@ -1,48 +1,34 @@
 import { random } from 'lodash';
 import { IEnemy } from '../enemies';
-import { deg } from '../utils';
 import { scene } from './setup';
+
+const texture = new THREE.TextureLoader().load('/textures/asteroidA.png');
+const specularMap = new THREE.TextureLoader().load(
+  '/textures/asteroidASpecular.png'
+);
 
 export const enemyElements: THREE.Mesh[] = [];
 
-export function addEnemies(initialEnemies: IEnemy[], xTriangle: THREE.Geometry) {
+export function addEnemies(
+  initialEnemies: IEnemy[],
+  asteroidGeo: THREE.Geometry
+) {
   const OFFSCREEN = 9999;
 
   initialEnemies.forEach(() => {
-    const geometry = new THREE.BoxGeometry(1, 1, 1);
-    const material = new THREE.MeshBasicMaterial({
-      opacity: 0,
-      side: THREE.BackSide,
-      transparent: true,
-    });
-    const xTriangleMaterial = new THREE.MeshPhongMaterial({
-      color: 0x78a5ec,
+    const material = new THREE.MeshPhongMaterial({
+      map: texture,
+      specularMap,
       opacity: 1,
-      shading: THREE.FlatShading,
-      side: THREE.BackSide,
-      specular: 0xffffff,
+      flatShading: false,
       transparent: true,
-    });
-    const triangleA = new THREE.Mesh(xTriangle, xTriangleMaterial);
-    const triangleB = new THREE.Mesh(xTriangle, xTriangleMaterial);
-    const element = new THREE.Mesh(geometry, material);
-    triangleA.position.x = -0.2;
-    triangleA.rotation.x = deg(90);
-    triangleA.rotation.y = deg(-90);
-    triangleA.scale.x = 2.4;
-    triangleA.scale.z = 2.4;
+    } as THREE.MaterialParameters);
 
-    triangleB.position.x = 0.2;
-    triangleB.rotation.x = deg(90);
-    triangleB.rotation.y = deg(-270);
-    triangleB.scale.x = 2.4;
-    triangleB.scale.z = 2.4;
+    const element = new THREE.Mesh(asteroidGeo, material);
 
     element.position.y = OFFSCREEN;
     scene.add(element);
     enemyElements.push(element);
-    element.add(triangleA);
-    element.add(triangleB);
   });
 }
 
@@ -65,6 +51,8 @@ export function updateEnemyInScene(enemy: IEnemy) {
   if (enemy.isActive) {
     element.position.x = enemy.x;
     element.position.y = enemy.y;
+    element.rotation.x = enemy.rotation + 0.1;
+    element.rotation.y = enemy.rotation + 0.1;
     element.rotation.z = enemy.rotation;
     element.children.forEach((child: THREE.Mesh) => {
       child.material.opacity = enemy.opacity;
@@ -114,15 +102,11 @@ function _updateColors(element: THREE.Mesh, enemy: IEnemy) {
 }
 
 function _updateChildrenColor(element: THREE.Mesh, color: number) {
-  element.children.forEach((child: THREE.Mesh) => {
-    const material = child.material as THREE.MeshPhongMaterial;
-    material.color.setHex(color);
-  });
+  const material = element.material as THREE.MeshPhongMaterial;
+  material.color.setHex(color);
 }
 
 function _updateChildrenEmissive(element: THREE.Mesh, color: number) {
-  element.children.forEach((child: THREE.Mesh) => {
-    const material = child.material as THREE.MeshPhongMaterial;
-    material.emissive.setHex(color);
-  });
+  const material = element.material as THREE.MeshPhongMaterial;
+  material.emissive.setHex(color);
 }

@@ -5,13 +5,12 @@ import { generateEnemies, IEnemy } from './enemies';
 import { updateRender } from './gameLayer';
 import { addBullets } from './gameLayer/bullets';
 import { addEnemies } from './gameLayer/enemies';
-import { addSphereBg } from './gameLayer/sphereBg';
 import { addXShip } from './gameLayer/xShip';
 import { gameLoop } from './gameLoop';
 import gameOverScene from './gameOverScene';
 import gameScene from './gameScene';
 import { GameState, GameStatus } from './gameState';
-import { parsedResults } from './getAssets';
+import { gameScenePromise, IGeometriesDictionary } from './getAssets';
 import initialScene from './initialScene';
 import { updateHiScore } from './score';
 import {
@@ -51,7 +50,7 @@ export interface IXShipStateData {
   opacity: number;
 }
 
-parsedResults.then(assets => {
+gameScenePromise.then((assets: IGeometriesDictionary) => {
   const els: IEls = {
     scoreEl: document.querySelector('.js-score'),
     hiScoreEl: document.querySelector('.js-hi-score'),
@@ -63,7 +62,7 @@ parsedResults.then(assets => {
     bonusBarEl: document.querySelector('.js-bonus-bar'),
   };
 
-  const { xShip: xShipGeo, xTriangle, sphereBgGeo } = assets;
+  const { xShipGeo, asteroidAGeo } = assets;
   const initialBullets = generateBullets(MAX_BULLETS);
   const initialEnemies = generateEnemies(ENEMIES_WAVE);
 
@@ -71,9 +70,8 @@ parsedResults.then(assets => {
     xShipGeo,
     shipPositionY: XSHIP_Y,
   });
-  addSphereBg(sphereBgGeo);
   addBullets(initialBullets);
-  addEnemies(initialEnemies, xTriangle);
+  addEnemies(initialEnemies, asteroidAGeo);
 
   const initialGameState: IGameStateData = {
     gameStatus: GameStatus.initial,
@@ -86,9 +84,9 @@ parsedResults.then(assets => {
     positionX: 0,
     positionY: XSHIP_Y,
     rotationY: 0,
-    scaleX: 0.3,
-    scaleY: 0.3,
-    scaleZ: 0.06,
+    scaleX: 1,
+    scaleY: 1,
+    scaleZ: 1,
     opacity: 1,
   };
   const xShipState = new GameState(1, initialXShipState);

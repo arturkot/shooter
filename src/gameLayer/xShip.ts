@@ -22,7 +22,10 @@ export function addXShip({
   shipPositionY: number;
 }) {
   const texture = new THREE.TextureLoader().load('/textures/xShip.png');
-  const material = new THREE.MeshPhongMaterial({ map: texture });
+  const material = new THREE.MeshLambertMaterial({
+    map: texture,
+    flatShading: false,
+  } as THREE.MaterialParameters);
   xShip = new THREE.Mesh(xShipGeo, material);
 
   xShip.position.y = shipPositionY;
