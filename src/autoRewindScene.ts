@@ -2,6 +2,7 @@ import { IBullet } from './bullets';
 import { clockGet, clockReset } from './clock';
 import { IEnemy } from './enemies';
 import { GameState, GameStatus } from './gameState';
+import { IHex } from './hexBg';
 import { IEls, IGameStateData, IXShipStateData } from './main';
 import { isMoveLeft, isMoveRight, mouseX } from './userEvents';
 import { moveXShip } from './xShip';
@@ -11,6 +12,8 @@ export default function(
   prevBulletsStates: GameState<IBullet[]>,
   enemiesState: GameState<IEnemy[]>,
   prevEnemiesStates: GameState<IEnemy[]>,
+  hexBgState: GameState<IHex[]>,
+  prevHexBgStates: GameState<IHex[]>,
   gameStatesCache: GameState<IGameStateData>,
   prevGameStates: GameState<IGameStateData>,
   gameState: GameState<IGameStateData>,
@@ -39,6 +42,7 @@ export default function(
     const prevEnemies = prevEnemiesStates.use() as IEnemy[];
     const prevState = prevGameStates.use();
     const prevBulletsState = prevBulletsStates.use();
+    const prevHexBgState = prevHexBgStates.use();
 
     if (prevBulletsState) {
       bulletsState.add(prevBulletsState);
@@ -46,6 +50,10 @@ export default function(
 
     if (prevEnemies) {
       enemiesState.add(prevEnemies);
+    }
+
+    if (prevHexBgState) {
+      hexBgState.add(prevHexBgState);
     }
 
     if (prevState) {
@@ -66,6 +74,7 @@ export default function(
       gameStatesCache.add(gameStateData);
       bulletsState.add(prevBulletsStates.get() as IBullet[]);
       enemiesState.add(prevEnemiesStates.get() as IEnemy[]);
+      hexBgState.add(prevHexBgStates.get() as IHex[]);
     }
   }
 }

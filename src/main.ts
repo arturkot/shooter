@@ -5,12 +5,14 @@ import { generateEnemies, IEnemy } from './enemies';
 import { updateRender } from './gameLayer';
 import { addBullets } from './gameLayer/bullets';
 import { addEnemies } from './gameLayer/enemies';
+import { addHexBg } from './gameLayer/hexBg';
 import { addXShip } from './gameLayer/xShip';
 import { gameLoop } from './gameLoop';
 import gameOverScene from './gameOverScene';
 import gameScene from './gameScene';
 import { GameState, GameStatus } from './gameState';
 import { gameScenePromise, IGeometriesDictionary } from './getAssets';
+import { generateHexBg, IHex } from './hexBg';
 import initialScene from './initialScene';
 import { updateHiScore } from './score';
 import {
@@ -62,9 +64,10 @@ gameScenePromise.then((assets: IGeometriesDictionary) => {
     bonusBarEl: document.querySelector('.js-bonus-bar'),
   };
 
-  const { xShipGeo, asteroidAGeo } = assets;
+  const { xShipGeo, asteroidAGeo, hexGeo } = assets;
   const initialBullets = generateBullets(MAX_BULLETS);
   const initialEnemies = generateEnemies(ENEMIES_WAVE);
+  const initialHexBg = generateHexBg();
 
   addXShip({
     xShipGeo,
@@ -72,6 +75,7 @@ gameScenePromise.then((assets: IGeometriesDictionary) => {
   });
   addBullets(initialBullets);
   addEnemies(initialEnemies, asteroidAGeo);
+  addHexBg(initialHexBg, hexGeo);
 
   const initialGameState: IGameStateData = {
     gameStatus: GameStatus.initial,
@@ -93,6 +97,8 @@ gameScenePromise.then((assets: IGeometriesDictionary) => {
   const bulletsState = new GameState<IBullet[]>(1, initialBullets);
   const prevBulletsStates = new GameState<IBullet[]>(100, initialBullets);
   const enemiesState = new GameState<IEnemy[]>(1, initialEnemies);
+  const hexBgState = new GameState<IHex[]>(1, initialHexBg);
+  const prevHexBgState = new GameState<IHex[]>(100, initialHexBg);
   const prevEnemiesStates = new GameState<IEnemy[]>(100, initialEnemies);
   const gameState = new GameState(1, initialGameState);
   const gameStatesCache = new GameState(2, initialGameState);
@@ -105,6 +111,7 @@ gameScenePromise.then((assets: IGeometriesDictionary) => {
     const lastXShipState = xShipState.get();
     const lastBullets = bulletsState.get();
     const lastEnemies = enemiesState.get();
+    const lastHexBg = hexBgState.get();
     const prevGameState = gameStatesCache.get(1);
     const lastGameState = gameState.get();
 
@@ -149,6 +156,8 @@ gameScenePromise.then((assets: IGeometriesDictionary) => {
           prevBulletsStates,
           enemiesState,
           prevEnemiesStates,
+          hexBgState,
+          prevHexBgState,
           gameStatesCache,
           prevGameStates,
           gameState,
@@ -164,6 +173,7 @@ gameScenePromise.then((assets: IGeometriesDictionary) => {
         gameScene(
           lastBullets,
           lastEnemies,
+          lastHexBg,
           lastGameState,
           prevGameState,
           els,
@@ -177,6 +187,9 @@ gameScenePromise.then((assets: IGeometriesDictionary) => {
           enemiesState.add(lastEnemies);
           prevEnemiesStates.add(lastEnemies);
 
+          hexBgState.add(lastHexBg);
+          prevHexBgState.add(lastHexBg);
+
           gameStatesCache.add(lastGameState);
           prevGameStates.add(lastGameState);
         }
@@ -187,6 +200,12 @@ gameScenePromise.then((assets: IGeometriesDictionary) => {
       }
     }
 
-    updateRender(lastGameState, lastXShipState, lastBullets, lastEnemies);
+    updateRender(
+      lastGameState,
+      lastXShipState,
+      lastBullets,
+      lastEnemies,
+      lastHexBg
+    );
   }
 });

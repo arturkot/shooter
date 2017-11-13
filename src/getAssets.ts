@@ -8,18 +8,24 @@ const objectLoader = new THREE.ObjectLoader();
 
 const gameScenePromise = new Promise(resolve => {
   objectLoader.load('meshes/gameScene.json', scene => {
-    const xShip = scene.getObjectByName('xShip');
-    const asteroidA = scene.getObjectByName('asteroidA');
-
-    const xShipGeo = values(
-      objectLoader.parseGeometries(xShip.toJSON().geometries)
-    )[0];
-    const asteroidAGeo = values(
-      objectLoader.parseGeometries(asteroidA.toJSON().geometries)
-    )[0];
-
-    resolve({ xShipGeo, asteroidAGeo });
+    resolve(extractGeoByNames(scene, ['xShip', 'asteroidA', 'hex']));
   });
 });
+
+function extractGeoByNames(scene: THREE.Object3D, names: string[]) {
+  const SUFFIX = 'Geo';
+
+  return names.reduce(
+    (object, name) => {
+      const object3d = scene.getObjectByName(name);
+      const geometry = values(
+        objectLoader.parseGeometries(object3d.toJSON().geometries)
+      )[0];
+
+      return Object.assign(object, { [name + SUFFIX]: geometry });
+    },
+    {} as IGeometriesDictionary
+  );
+}
 
 export { gameScenePromise };

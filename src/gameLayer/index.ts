@@ -1,16 +1,19 @@
 import { IBullet } from '../bullets';
 import { IEnemy } from '../enemies';
 import { GameStatus } from '../gameState';
+import { IHex } from '../hexBg';
 import { IGameStateData, IXShipStateData } from '../main';
 import { updateBullet } from './bullets';
 import { updateEnemyInScene } from './enemies';
+import { flipBackHex, flipHex, updateHexInScene } from './hexBg';
 import { updateXShip } from './xShip';
 
 export function updateRender(
   gameState: IGameStateData,
   xShip: IXShipStateData,
   bullets: IBullet[],
-  enemies: IEnemy[]
+  enemies: IEnemy[],
+  hexBg: IHex[]
 ) {
   if (
     gameState.gameStatus === GameStatus.autoRewind ||
@@ -26,9 +29,13 @@ export function updateRender(
     gameState.gameStatus === GameStatus.gameOver
   ) {
     bullets.forEach(updateBullet);
+    hexBg.forEach(updateHexInScene);
+    hexBg.forEach(flipBackHex);
   }
 
   if (gameState.gameStatus === GameStatus.autoRewind) {
     bullets.forEach(updateBullet);
+    hexBg.forEach(updateHexInScene);
+    hexBg.forEach(flipHex);
   }
 }
