@@ -5,8 +5,11 @@ import { scene } from './setup';
 const elements: THREE.Object3D[] = [];
 
 export function addHexBg(initialHexBg: IHex[], hexGeo: THREE.Geometry) {
+  const texture = new THREE.TextureLoader().load('/textures/hexA.png');
+  const material = new THREE.MeshBasicMaterial({ map: texture });
+
   initialHexBg.forEach(hex => {
-    const element = new THREE.Mesh(hexGeo);
+    const element = new THREE.Mesh(hexGeo, material);
 
     element.position.x = hex.x;
     element.position.y = hex.y;

@@ -19,7 +19,7 @@ renderer.setSize(
 document.body.appendChild(renderer.domElement);
 window.addEventListener('resize', updateSize);
 updateSize();
-light.position.set(4, 4, 10);
+light.position.set(8, 4, 10);
 scene.add(light);
 
 function updateSize() {
