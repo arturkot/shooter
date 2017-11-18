@@ -7,6 +7,7 @@
   "license": "MIT",
   "dependencies": {
     "@types/howler": "^2.0.0",
+    "@types/lodash": "^4.14.85",
     "@types/three": "^0.84.28",
     "babel-core": "^6.18.2",
     "babel-loader": "^6.2.8",
