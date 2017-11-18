@@ -1,3 +1,4 @@
+import { shuffle } from 'lodash';
 import { IHex } from '../hexBg';
 import { deg } from '../utils';
 import { scene } from './setup';
@@ -5,15 +6,22 @@ import { scene } from './setup';
 const elements: THREE.Object3D[] = [];
 
 export function addHexBg(initialHexBg: IHex[], hexGeo: THREE.Geometry) {
-  const texture = new THREE.TextureLoader().load('/textures/hexA.png');
-  const material = new THREE.MeshBasicMaterial({ map: texture });
+  const materials: THREE.MeshBasicMaterial[] = [
+    'hexA',
+    'hexB',
+    'hexC',
+  ].map(name => {
+    const textureA = new THREE.TextureLoader().load(`/textures/${name}.png`);
+    return new THREE.MeshBasicMaterial({ map: textureA });
+  });
 
   initialHexBg.forEach(hex => {
-    const element = new THREE.Mesh(hexGeo, material);
+    const element = new THREE.Mesh(hexGeo, shuffle(materials)[0]);
 
     element.position.x = hex.x;
     element.position.y = hex.y;
     element.position.z = -10;
+    element.rotation.z = deg(-120);
     scene.add(element);
     elements.push(element);
   });
