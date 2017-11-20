@@ -1,13 +1,15 @@
 import { random, range } from 'lodash';
 import { GAME_HEIGHT, leftBoundary } from './boundaries';
-import { deg } from './utils';
 import { timeUnit } from './gameLoop';
+import { deg } from './utils';
 
+const OFFSCREEN = -9999;
 const HEX_HEIGHT = 2;
 const ROWS_NR = 12;
 const COLUMNS_NR = 6;
 
 export interface IHex {
+  realX: number;
   x: number;
   y: number;
   rotationX: number;
@@ -33,17 +35,21 @@ export function updateHex(hex: IHex) {
   const SPEED = timeUnit * 0.1;
   const isRestart = hex.y <= -HEX_HEIGHT - GAME_HEIGHT / 2 + HEX_HEIGHT / 4;
 
-  hex.y = isRestart
-    ? hex.y +
+  if (isRestart) {
+    const isHidden = random(0, 3) === 0;
+    hex.x = isHidden ? OFFSCREEN : hex.realX;
+    hex.y =
+      hex.y +
       ROWS_NR * HEX_HEIGHT -
       GAME_HEIGHT / 2 +
       3 * HEX_HEIGHT / 4 -
-      SPEED
-    : hex.y - SPEED;
+      SPEED;
+  } else {
+    hex.y = hex.y - SPEED;
+  }
 }
 
 function generateHex(x: number, y: number): IHex {
-  const OFFSCREEN = -9999;
   const HEX_WIDTH = Math.sqrt(3) / 2 * HEX_HEIGHT;
   const adjustedX =
     y % 2 === 0
@@ -52,10 +58,9 @@ function generateHex(x: number, y: number): IHex {
   const isHidden = random(0, 3) === 0;
 
   return {
+    realX: adjustedX,
     x: isHidden ? OFFSCREEN : adjustedX,
-    y: isHidden
-      ? OFFSCREEN
-      : y * HEX_HEIGHT - GAME_HEIGHT / 2 - y * HEX_HEIGHT / 4,
+    y: y * HEX_HEIGHT - GAME_HEIGHT / 2 - y * HEX_HEIGHT / 4,
     rotationX: deg(0),
     flipSpeed: random(0.05, 0.1, true),
     isHidden,

@@ -29,6 +29,7 @@ export function addHexBg(initialHexBg: IHex[], hexGeo: THREE.Geometry) {
 
 export function updateHexInScene(hex: IHex, index: number) {
   const hexObject = elements[index];
+  hexObject.position.x = hex.x;
   hexObject.position.y = hex.y;
 }
 
