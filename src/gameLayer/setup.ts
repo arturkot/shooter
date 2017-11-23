@@ -9,7 +9,8 @@ const camera = new THREE.OrthographicCamera(
   1000
 );
 const renderer = new THREE.WebGLRenderer({ alpha: true });
-const light = new THREE.PointLight(0xffffff, 2, 200);
+const pointLight = new THREE.PointLight(0xffffff, 2, 200);
+const ambientLight = new THREE.AmbientLight(0xfff, 1);
 const pixelRatio = window.devicePixelRatio;
 
 renderer.setSize(
@@ -19,8 +20,9 @@ renderer.setSize(
 document.body.appendChild(renderer.domElement);
 window.addEventListener('resize', updateSize);
 updateSize();
-light.position.set(8, 4, 10);
-scene.add(light);
+pointLight.position.set(8, 4, 10);
+scene.add(pointLight);
+scene.add(ambientLight);
 
 function updateSize() {
   renderer.setSize(
