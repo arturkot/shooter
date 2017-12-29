@@ -6,6 +6,7 @@ import { IGameStateData, IXShipStateData } from '../main';
 import { updateBullet } from './bullets';
 import { updateEnemyInScene } from './enemies';
 import { flipBackHex, flipHex, updateHexInScene } from './hexBg';
+import { updatePlaneInScene } from './planeBg';
 import { updateXShip } from './xShip';
 
 export function updateRender(
@@ -31,11 +32,13 @@ export function updateRender(
     bullets.forEach(updateBullet);
     hexBg.forEach(updateHexInScene);
     hexBg.forEach(flipBackHex);
+    updatePlaneInScene(true);
   }
 
   if (gameState.gameStatus === GameStatus.autoRewind) {
     bullets.forEach(updateBullet);
     hexBg.forEach(updateHexInScene);
     hexBg.forEach(flipHex);
+    updatePlaneInScene(false);
   }
 }

@@ -22,6 +22,7 @@ import {
   MAX_BULLETS,
   XSHIP_Y,
 } from './settings';
+import {addPlaneBg} from './gameLayer/planeBg';
 
 export interface IEls {
   scoreEl: Element | null;
@@ -76,6 +77,7 @@ gameScenePromise.then((assets: IGeometriesDictionary) => {
   addBullets(initialBullets);
   addEnemies(initialEnemies, asteroidAGeo);
   addHexBg(initialHexBg, hexGeo);
+  addPlaneBg();
 
   const initialGameState: IGameStateData = {
     gameStatus: GameStatus.initial,

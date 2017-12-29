@@ -44,41 +44,6 @@
       font-family: sans-serif;
     }
 
-    @keyframes space-bg-a {
-      from {
-        transform: translateY(-100%);
-      }
-
-      to {
-        transform: translateY(0);
-      }
-    }
-
-    @keyframes space-bg-b {
-      from {
-        transform: translateY(0);
-      }
-
-      to {
-        transform: translateY(100%);
-      }
-    }
-
-    .space-bg {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 100%;
-      background: url(textures/space.png);
-      animation: space-bg-a linear 20s infinite;
-      background-size: auto 100%;
-    }
-
-    .space-bg + .space-bg {
-      animation: space-bg-b linear 20s infinite;
-    }
-
     body > canvas {
       position: relative;
       display: block;
@@ -228,8 +193,6 @@
   </style>
 </head>
 <body>
-  <div class="space-bg"></div>
-  <div class="space-bg"></div>
   <div class="flash js-flash"></div>
   <div class="score">
     <div>Score: <span class="score__points js-score">0000</span></div>
