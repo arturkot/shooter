@@ -3,9 +3,6 @@ import { IEnemy } from '../enemies';
 import { scene } from './setup';
 
 const texture = new THREE.TextureLoader().load('/textures/asteroidA.png');
-const specularMap = new THREE.TextureLoader().load(
-  '/textures/asteroidASpecular.png'
-);
 
 export const enemyElements: THREE.Mesh[] = [];
 
@@ -16,9 +13,8 @@ export function addEnemies(
   const OFFSCREEN = 9999;
 
   initialEnemies.forEach(() => {
-    const material = new THREE.MeshPhongMaterial({
+    const material = new THREE.MeshLambertMaterial({
       map: texture,
-      specularMap,
       opacity: 1,
       flatShading: false,
       transparent: true,
