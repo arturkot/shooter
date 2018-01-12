@@ -29,6 +29,8 @@ describe(`gameState`, () => {
       gameStatus: GameStatus.gameOver,
       score: 22,
       lives: 44,
+      scoreChunk: 3,
+      scoreMultiplier: 99,
     } as IGameStateData;
 
     gameState.add([newState]);
