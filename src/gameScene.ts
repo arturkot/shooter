@@ -13,7 +13,7 @@ import {
   updateEnemy,
 } from './enemies';
 import { GameStatus } from './gameState';
-import { IHex, updateHex} from './hexBg';
+import { IHex, updateHex } from './hexBg';
 import { IEls, IGameStateData, IXShipStateData } from './main';
 import { updateHiScore, updateScore } from './score';
 import { blasterSound, explosionSound, hitSound, wooshSound } from './sounds';
