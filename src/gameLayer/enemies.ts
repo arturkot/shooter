@@ -2,7 +2,7 @@ import { random } from 'lodash';
 import { IEnemy } from '../enemies';
 import { scene } from './setup';
 
-const texture = new THREE.TextureLoader().load('/textures/asteroidA.png');
+const texture = new THREE.TextureLoader().load('/shooter/textures/asteroidA.png');
 
 export const enemyElements: THREE.Mesh[] = [];
 

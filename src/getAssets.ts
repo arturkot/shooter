@@ -7,7 +7,7 @@ export interface IGeometriesDictionary {
 const objectLoader = new THREE.ObjectLoader();
 
 const gameScenePromise = new Promise(resolve => {
-  objectLoader.load('meshes/gameScene.json', scene => {
+    objectLoader.load('/shooter/meshes/gameScene.json', scene => {
     resolve(extractGeoByNames(scene, ['xShip', 'asteroidA', 'hex']));
   });
 });
