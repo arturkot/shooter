@@ -1,6 +1,6 @@
 import { scene } from './setup';
 
-const texture = new THREE.TextureLoader().load('/textures/space.png');
+const texture = new THREE.TextureLoader().load('/shooter/textures/space.png');
 texture.wrapS = THREE.RepeatWrapping;
 texture.wrapT = THREE.RepeatWrapping;
 texture.repeat.set(3, 3);

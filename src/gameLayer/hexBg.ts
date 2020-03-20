@@ -11,7 +11,7 @@ export function addHexBg(initialHexBg: IHex[], hexGeo: THREE.Geometry) {
     'hexB',
     'hexC',
   ].map(name => {
-    const textureA = new THREE.TextureLoader().load(`/textures/${name}.png`);
+    const textureA = new THREE.TextureLoader().load(`/shooter/textures/${name}.png`);
     return new THREE.MeshBasicMaterial({ map: textureA });
   });
 

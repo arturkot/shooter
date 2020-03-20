@@ -21,7 +21,7 @@ export function addXShip({
   xShipGeo: THREE.Geometry;
   shipPositionY: number;
 }) {
-  const texture = new THREE.TextureLoader().load('/textures/xShip.png');
+  const texture = new THREE.TextureLoader().load('/shooter/textures/xShip.png');
   const material = new THREE.MeshLambertMaterial({
     map: texture,
     flatShading: false,
